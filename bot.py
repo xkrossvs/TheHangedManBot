@@ -7,6 +7,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
+from keyboards import Keyboards
 
 
 dp = Dispatcher()
@@ -14,7 +15,9 @@ dp = Dispatcher()
 
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
-    await message.answer(f"Hello, {html.bold(message.from_user.full_name)}!")
+    await message.answer(text=f"Привет, {message.from_user.full_name}, и добро пожаловать в игру '<b>Висельница</b>'. "
+                         f"Нажмите 'Начать игру', чтобы начать игру.",
+                         reply_markup=Keyboards.main_menu())
 
 
 @dp.message()
