@@ -2,13 +2,13 @@ import asyncio
 import logging
 import sys
 from config import TOKEN
-from aiogram import Bot, Dispatcher, html
+from aiogram import Bot, Dispatcher, F
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 from keyboards import Keyboards
-
+from strings import Strings
 
 dp = Dispatcher()
 
@@ -20,12 +20,9 @@ async def command_start_handler(message: Message) -> None:
                          reply_markup=Keyboards.main_menu())
 
 
-@dp.message()
-async def echo_handler(message: Message) -> None:
-    try:
-        await message.send_copy(chat_id=618805465)
-    except TypeError:
-        await message.answer("Nice try!")
+@dp.message(F.text == Strings.START_GAME_BUTTON)
+async def start_game_handler(message: Message) -> None:
+    await message.answer('Эта функция не доступна.')
 
 
 async def main() -> None:
