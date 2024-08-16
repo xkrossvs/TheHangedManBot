@@ -39,6 +39,10 @@ async def start_game_handler(message: Message, state: FSMContext) -> None:
                          reply_markup=ReplyKeyboardRemove())
 
 
+@dp.message(F.text.len() == 1, F.text.in_(Strings.CYRILLIC_LETTERS))
+async def letter_catcher(message: Message):
+    await message.answer(text='Я поймал букву.')
+
 async def main() -> None:
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
