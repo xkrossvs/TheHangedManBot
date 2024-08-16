@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import sys
-from config import TOKEN
+from config import TOKEN, MONGO_URL
 from aiogram import Bot, Dispatcher, F
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -12,8 +12,12 @@ from strings import Strings
 from words import words
 from random import choice
 from hangs import stages
+from aiogram.fsm.storage.mongo import MongoStorage
+from aiogram.fsm.context import FSMContext
 
-dp = Dispatcher()
+
+storage = MongoStorage.from_url(url=MONGO_URL, db_name='the_hanged_man')
+dp = Dispatcher(storage=storage)
 
 
 @dp.message(CommandStart())
@@ -24,8 +28,9 @@ async def command_start_handler(message: Message) -> None:
 
 
 @dp.message(F.text == Strings.START_GAME_BUTTON)
-async def start_game_handler(message: Message) -> None:
+async def start_game_handler(message: Message, state: FSMContext) -> None:
     word = choice(words)
+    await state.update_data(word=word)
     len_word = len(word)
     await message.answer(text=f'Загадано слово из {len_word} букв.\n'
                               f'У вас есть право на 5 ошибок.\n\n'
