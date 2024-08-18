@@ -15,7 +15,6 @@ from hangs import stages
 from aiogram.fsm.storage.mongo import MongoStorage
 from aiogram.fsm.context import FSMContext
 
-
 storage = MongoStorage.from_url(url=MONGO_URL, db_name='the_hanged_man')
 dp = Dispatcher(storage=storage)
 
@@ -31,21 +30,42 @@ async def command_start_handler(message: Message) -> None:
 async def start_game_handler(message: Message, state: FSMContext) -> None:
     word = choice(words)
     await state.update_data(word=word)
-    len_word = len(word)
-    await message.answer(text=f'Загадано слово из {len_word} букв.\n'
-                              f'У вас есть право на 5 ошибок.\n\n'
-                              f'{'_ ' * len_word}\n'
-                              f'{stages[-1]}',
-                         reply_markup=ReplyKeyboardRemove())
+    text_word = '_ ' * len(word)
+    await state.update_data(text_word=text_word)
+    hang_state = -1
+    await state.update_data(hang_state=hang_state)
+    answer = await message.answer(text=f'Загадано слово из {len(word)} букв.\n'
+                                       f'У вас есть право на 5 ошибок.\n\n'
+                                       f'{text_word}\n'
+                                       f'{stages[hang_state]}')
+    chat_id = answer.chat.id
+    await state.update_data(chat_id=chat_id)
+    message_id = answer.message_id
+    await state.update_data(message_id=message_id)
 
 
 @dp.message(F.text.len() == 1, F.text.in_(Strings.CYRILLIC_LETTERS))
-async def letter_catcher(message: Message):
-    await message.answer(text='Я поймал букву.')
+async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
+    await message.delete()
+    letter = message.text
+    data = await state.get_data()
+    word = data['word']
+    chat_id = data['chat_id']
+    message_id = data['message_id']
+    text_word = data['text_word']
+    if letter not in word:
+        hang_state = data['hang_state'] - 1
+        await state.update_data(hang_state=hang_state)
+        await bot.edit_message_text(text=f'Вы не отгадали букву.\n'
+                                         f'У вас 1 право на ошибку исчерпано.\n\n'
+                                         f'{text_word}\n\n'
+                                         f'{stages[hang_state]}',
+                                    chat_id=chat_id,
+                                    message_id=message_id)
+
 
 async def main() -> None:
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-
     await dp.start_polling(bot)
 
 
