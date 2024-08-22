@@ -53,6 +53,7 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
     chat_id = data['chat_id']
     message_id = data['message_id']
     text_word = data['text_word']
+
     if letter not in word:
         hang_state = data['hang_state'] - 1
         await state.update_data(hang_state=hang_state)
@@ -62,7 +63,8 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
                                          f'{stages[hang_state]}',
                                     chat_id=chat_id,
                                     message_id=message_id)
-
+        return
+    
 
 async def main() -> None:
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
@@ -70,5 +72,8 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-    asyncio.run(main())
+    try:
+        logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print('Бот завершил работу.')
