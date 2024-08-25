@@ -14,7 +14,7 @@ from random import choice
 from hangs import stages
 from aiogram.fsm.storage.mongo import MongoStorage
 from aiogram.fsm.context import FSMContext
-from units import find_all_indices
+from units import find_all_indices, is_it_a_win
 
 storage = MongoStorage.from_url(url=MONGO_URL, db_name='the_hanged_man')
 dp = Dispatcher(storage=storage)
@@ -75,13 +75,21 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
         return
     for i in find_all_indices(word, letter):
         text_word[i] = letter
-    await state.update_data(text_word=text_word)
-    await bot.edit_message_text(text=f'Вы отгадали букву.\n'
-                                     f'Поздравляю, вы на 1 шаг ближе к победе.\n\n'
-                                     f'{' '.join(text_word)}\n\n'
-                                     f'{stages[hang_state]}',
-                                chat_id=chat_id,
-                                message_id=message_id)
+
+    if is_it_a_win(word, text_word):
+        await bot.edit_message_text(text=f'Вы выиграли. :)\n'
+                                         f'Вы угадали слово: {word}\n\n'
+                                         f'{stages[hang_state]}',
+                                    chat_id=chat_id,
+                                    message_id=message_id)
+    else:
+        await state.update_data(text_word=text_word)
+        await bot.edit_message_text(text=f'Вы отгадали букву.\n'
+                                         f'Поздравляю, вы на 1 шаг ближе к победе.\n\n'
+                                         f'{' '.join(text_word)}\n\n'
+                                         f'{stages[hang_state]}',
+                                    chat_id=chat_id,
+                                    message_id=message_id)
     
 
 async def main() -> None:
