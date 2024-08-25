@@ -59,12 +59,19 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
     if letter not in word:
         hang_state -= 1
         await state.update_data(hang_state=hang_state)
-        await bot.edit_message_text(text=f'Вы не отгадали букву.\n'
-                                         f'Сожалею, вы на 1 шаг ближе к поражению.\n\n'
-                                         f'{' '.join(text_word)}\n\n'
-                                         f'{stages[hang_state]}',
-                                    chat_id=chat_id,
-                                    message_id=message_id)
+        if hang_state != -7:
+            await bot.edit_message_text(text=f'Вы не отгадали букву.\n'
+                                             f'Сожалею, вы на 1 шаг ближе к поражению.\n\n'
+                                             f'{' '.join(text_word)}\n\n'
+                                             f'{stages[hang_state]}',
+                                        chat_id=chat_id,
+                                        message_id=message_id)
+        else:
+            await bot.edit_message_text(text=f'Вы проиграли. :(\n'
+                                             f'Слово было: {word}\n\n'
+                                             f'{stages[hang_state]}',
+                                        chat_id=chat_id,
+                                        message_id=message_id)
         return
     for i in find_all_indices(word, letter):
         text_word[i] = letter
