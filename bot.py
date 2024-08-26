@@ -37,7 +37,7 @@ async def start_game_handler(message: Message, state: FSMContext) -> None:
     await state.update_data(hang_state=hang_state)
     answer = await message.answer(text=f'Загадано слово из {len(word)} букв.\n'
                                        f'У вас есть право на 5 ошибок.\n\n'
-                                       f'{' '.join(text_word)}\n'
+                                       f'{' '.join( text_word)}\n'
                                        f'{stages[hang_state]}')
     chat_id = answer.chat.id
     await state.update_data(chat_id=chat_id)
