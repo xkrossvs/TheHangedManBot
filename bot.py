@@ -35,6 +35,8 @@ async def start_game_handler(message: Message, state: FSMContext) -> None:
     await state.update_data(text_word=text_word)
     hang_state = -1
     await state.update_data(hang_state=hang_state)
+    wrong_letters = []
+    await state.update_data(wrong_letters=wrong_letters)
     answer = await message.answer(text=f'Загадано слово из {len(word)} букв.\n'
                                        f'У вас есть право на 5 ошибок.\n\n'
                                        f'{' '.join( text_word)}\n'
@@ -55,15 +57,20 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
     message_id = data['message_id']
     text_word = data['text_word']
     hang_state = data['hang_state']
+    wrong_letters = data['wrong_letters']
 
     if letter not in word:
+        wrong_letters.append(letter)
+        await state.update_data(wrong_letters=wrong_letters)
         hang_state -= 1
         await state.update_data(hang_state=hang_state)
         if hang_state != -7:
             await bot.edit_message_text(text=f'Вы не отгадали букву.\n'
-                                             f'Сожалею, вы на 1 шаг ближе к поражению.\n\n'
+                                             f'Сожалею, вы на 1 шаг ближе к поражению.\n'
+                                             f'Осталось прав на ошибку: {6 + hang_state}\n\n'
                                              f'{' '.join(text_word)}\n\n'
-                                             f'{stages[hang_state]}',
+                                             f'{stages[hang_state]}\n\n'
+                                             f'Неправильные буквы: {' '.join(wrong_letters)}',
                                         chat_id=chat_id,
                                         message_id=message_id)
         else:
@@ -86,8 +93,10 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
         await state.update_data(text_word=text_word)
         await bot.edit_message_text(text=f'Вы отгадали букву.\n'
                                          f'Поздравляю, вы на 1 шаг ближе к победе.\n\n'
+                                         f'Осталось прав на ошибку: {6 + hang_state}\n\n'
                                          f'{' '.join(text_word)}\n\n'
-                                         f'{stages[hang_state]}',
+                                         f'{stages[hang_state]}\n\n'
+                                         f'Неправильные буквы: {' '.join(wrong_letters)}',
                                     chat_id=chat_id,
                                     message_id=message_id)
     
