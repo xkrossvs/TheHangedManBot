@@ -6,7 +6,7 @@ from aiogram import Bot, Dispatcher, F
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message
 from keyboards import Keyboards
 from strings import Strings
 from words import words
@@ -39,7 +39,7 @@ async def start_game_handler(message: Message, state: FSMContext) -> None:
     await state.update_data(wrong_letters=wrong_letters)
     answer = await message.answer(text=f'Загадано слово из {len(word)} букв.\n'
                                        f'У вас есть право на 5 ошибок.\n\n'
-                                       f'{' '.join( text_word)}\n'
+                                       f'{' '.join(text_word)}\n'
                                        f'{stages[hang_state]}')
     chat_id = answer.chat.id
     await state.update_data(chat_id=chat_id)
@@ -66,7 +66,7 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
         await state.update_data(hang_state=hang_state)
         if hang_state != -7:
             await bot.edit_message_text(text=f'Вы не отгадали букву.\n'
-                                             f'Сожалею, вы на 1 шаг ближе к поражению.\n'
+                                             f'Сожалею, вы на 1 шаг ближе к поражению.\n\n'
                                              f'Осталось прав на ошибку: {6 + hang_state}\n\n'
                                              f'{' '.join(text_word)}\n\n'
                                              f'{stages[hang_state]}\n\n'
@@ -99,6 +99,11 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
                                          f'Неправильные буквы: {' '.join(wrong_letters)}',
                                     chat_id=chat_id,
                                     message_id=message_id)
+
+
+@dp.message()
+async def message_deleter(message: Message):
+    await message.delete()
     
 
 async def main() -> None:
