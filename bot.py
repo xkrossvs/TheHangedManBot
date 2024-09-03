@@ -70,6 +70,9 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
     wrong_letters = data['wrong_letters']
 
     if letter not in word:
+        if letter in wrong_letters:
+            await message.delete()
+            return
         wrong_letters.append(letter)
         await state.update_data(wrong_letters=wrong_letters)
         hang_state -= 1
@@ -89,7 +92,8 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
             await message.answer(text=f'Вы проиграли. :(\n'
                                       f'Слово было: {word}\n'
                                       f'Начните сначала.\n\n'
-                                      f'{stages[hang_state]}',
+                                      f'{stages[hang_state]}\n\n'
+                                      f'Неправильные буквы: {' '.join(wrong_letters)}',
                                  reply_markup=Keyboards.main_menu())
             await state.clear()
         return
@@ -102,7 +106,8 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
         await message.answer(text=f'Вы выиграли. :)\n'
                                   f'Вы угадали слово: {word}\n'
                                   f'Начните сначала.\n\n'
-                                  f'{stages[hang_state]}',
+                                  f'{stages[hang_state]}\n\n'
+                                  f'Неправильные буквы: {' '.join(wrong_letters)}',
                              reply_markup=Keyboards.main_menu())
         await state.clear()
     else:
