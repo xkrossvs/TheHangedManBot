@@ -6,7 +6,7 @@ from aiogram import Bot, Dispatcher, F
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
-from aiogram.types import Message
+from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.fsm.state import StatesGroup, State
 from keyboards import Keyboards
 from strings import Strings
@@ -33,7 +33,11 @@ async def command_start_handler(message: Message) -> None:
 
 
 @dp.message(F.text == Strings.START_GAME_BUTTON)
-async def start_game_handler(message: Message, state: FSMContext) -> None:
+async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> None:
+    loading_message = await message.answer(text='Загрузка...',
+                                           reply_markup=ReplyKeyboardRemove())
+    await bot.delete_message(chat_id=loading_message.chat.id,
+                             message_id=loading_message.message_id)
     word = choice(words)
     await state.update_data(word=word)
     text_word = ['_'] * len(word)
@@ -80,22 +84,26 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
                                         chat_id=chat_id,
                                         message_id=message_id)
         else:
-            await bot.edit_message_text(text=f'Вы проиграли. :(\n'
-                                             f'Слово было: {word}\n\n'
-                                             f'{stages[hang_state]}',
-                                        chat_id=chat_id,
-                                        message_id=message_id)
+            await bot.delete_message(chat_id=chat_id,
+                                     message_id=message_id)
+            await message.answer(text=f'Вы проиграли. :(\n'
+                                      f'Слово было: {word}\n'
+                                      f'Начните сначала.\n\n'
+                                      f'{stages[hang_state]}',
+                                 reply_markup=Keyboards.main_menu())
             await state.clear()
         return
     for i in find_all_indices(word, letter):
         text_word[i] = letter
 
     if is_it_a_win(word, text_word):
-        await bot.edit_message_text(text=f'Вы выиграли. :)\n'
-                                         f'Вы угадали слово: {word}\n\n'
-                                         f'{stages[hang_state]}',
-                                    chat_id=chat_id,
-                                    message_id=message_id)
+        await bot.delete_message(chat_id=chat_id,
+                                 message_id=message_id)
+        await message.answer(text=f'Вы выиграли. :)\n'
+                                  f'Вы угадали слово: {word}\n'
+                                  f'Начните сначала.\n\n'
+                                  f'{stages[hang_state]}',
+                             reply_markup=Keyboards.main_menu())
         await state.clear()
     else:
         await state.update_data(text_word=text_word)
@@ -112,7 +120,7 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
 @dp.message()
 async def message_deleter(message: Message):
     await message.delete()
-    
+
 
 async def main() -> None:
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
