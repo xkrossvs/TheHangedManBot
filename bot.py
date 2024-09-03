@@ -7,6 +7,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
+from aiogram.fsm.state import StatesGroup, State
 from keyboards import Keyboards
 from strings import Strings
 from words import words
@@ -18,6 +19,10 @@ from units import find_all_indices, is_it_a_win
 
 storage = MongoStorage.from_url(url=MONGO_URL, db_name='the_hanged_man')
 dp = Dispatcher(storage=storage)
+
+
+class GameProcess(StatesGroup):
+    game = State()
 
 
 @dp.message(CommandStart())
@@ -45,9 +50,10 @@ async def start_game_handler(message: Message, state: FSMContext) -> None:
     await state.update_data(chat_id=chat_id)
     message_id = answer.message_id
     await state.update_data(message_id=message_id)
+    await state.set_state(GameProcess.game)
 
 
-@dp.message(F.text.len() == 1, F.text.upper().in_(Strings.CYRILLIC_LETTERS))
+@dp.message(F.text.len() == 1, F.text.upper().in_(Strings.CYRILLIC_LETTERS), GameProcess.game)
 async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
     await message.delete()
     letter = message.text.upper()
@@ -79,6 +85,7 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
                                              f'{stages[hang_state]}',
                                         chat_id=chat_id,
                                         message_id=message_id)
+            await state.clear()
         return
     for i in find_all_indices(word, letter):
         text_word[i] = letter
@@ -89,6 +96,7 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
                                          f'{stages[hang_state]}',
                                     chat_id=chat_id,
                                     message_id=message_id)
+        await state.clear()
     else:
         await state.update_data(text_word=text_word)
         await bot.edit_message_text(text=f'Вы отгадали букву.\n'
