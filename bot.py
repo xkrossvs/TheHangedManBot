@@ -1,6 +1,8 @@
 import asyncio
 import logging
 import sys
+import pymongo
+from pymongo.collection import Collection
 from config import TOKEN, MONGO_URL
 from aiogram import Bot, Dispatcher, F
 from aiogram.client.default import DefaultBotProperties
@@ -19,6 +21,8 @@ from units import find_all_indices, is_it_a_win
 
 storage = MongoStorage.from_url(url=MONGO_URL, db_name='the_hanged_man')
 dp = Dispatcher(storage=storage)
+cluster = pymongo.MongoClient(MONGO_URL)
+users: Collection = cluster.the_hanged_man.users
 
 
 class GameProcess(StatesGroup):
@@ -30,6 +34,11 @@ async def command_start_handler(message: Message) -> None:
     await message.answer(text=f"Привет, {message.from_user.full_name}, и добро пожаловать в игру '<b>Висельница</b>'. "
                               f"Нажмите 'Начать игру', чтобы начать игру.",
                          reply_markup=Keyboards.main_menu())
+    user_id = message.from_user.id
+    full_name = message.from_user.full_name
+    if not users.find_one({'user_id': user_id}):
+        users.insert_one({'user_id': user_id, 'full_name': full_name,
+                          'wins': 0, 'losses': 0, 'WL': 0, 'used_words': []})
 
 
 @dp.message(F.text == Strings.START_GAME_BUTTON)
