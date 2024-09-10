@@ -18,6 +18,7 @@ from hangs import stages
 from aiogram.fsm.storage.mongo import MongoStorage
 from aiogram.fsm.context import FSMContext
 from units import find_all_indices, is_it_a_win
+from stickers import win_stickers
 
 storage = MongoStorage.from_url(url=MONGO_URL, db_name='the_hanged_man')
 dp = Dispatcher(storage=storage)
@@ -143,6 +144,7 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
     if is_it_a_win(word, text_word):
         await bot.delete_message(chat_id=chat_id,
                                  message_id=message_id)
+        await bot.send_sticker(chat_id, choice(win_stickers))
         await message.answer(text=f'Вы выиграли. :)\n'
                                   f'Вы угадали слово: {word}\n'
                                   f'Начните сначала.\n\n'
