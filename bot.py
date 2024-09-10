@@ -61,7 +61,11 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
                                            reply_markup=ReplyKeyboardRemove())
     await bot.delete_message(chat_id=loading_message.chat.id,
                              message_id=loading_message.message_id)
+    user_id = message.from_user.id
+    used_words = users.find_one({'user_id': user_id})['used_words']
     word = choice(words)
+    while word in used_words:
+        word = choice(words)
     await state.update_data(word=word)
     text_word = ['_'] * len(word)
     await state.update_data(text_word=text_word)
@@ -73,6 +77,8 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
                                        f'У вас есть право на 5 ошибок.\n\n'
                                        f'{' '.join(text_word)}\n'
                                        f'{stages[hang_state]}')
+    users.update_one(filter={'user_id': user_id},
+                     update={'$push': {'used_words': word}})
     chat_id = answer.chat.id
     await state.update_data(chat_id=chat_id)
     message_id = answer.message_id
@@ -83,6 +89,7 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
 @dp.message(F.text.len() == 1, F.text.upper().in_(Strings.CYRILLIC_LETTERS), GameProcess.game)
 async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
     await message.delete()
+    user_id = message.from_user.id
     letter = message.text.upper()
     data = await state.get_data()
     word = data['word']
@@ -118,6 +125,16 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
                                       f'{stages[hang_state]}\n\n'
                                       f'Неправильные буквы: {' '.join(wrong_letters)}',
                                  reply_markup=Keyboards.main_menu())
+
+            users.update_one(filter={'user_id': user_id},
+                             update={'$inc': {'losses': 1},
+                                     '$set': {'win_streak': 0}})
+            info = users.find_one({'user_id': user_id})
+
+            wl = round(info['wins'] / info['losses'], 2)
+            users.update_one(filter={'user_id': user_id},
+                             update={'$set': {'WL': wl if wl != int(wl) else int(wl)}})
+
             await state.clear()
         return
     for i in find_all_indices(word, letter):
@@ -132,6 +149,20 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
                                   f'{stages[hang_state]}\n\n'
                                   f'Неправильные буквы: {' '.join(wrong_letters)}',
                              reply_markup=Keyboards.main_menu())
+
+        users.update_one(filter={'user_id': user_id},
+                         update={'$inc': {'wins': 1, 'win_streak': 1}})
+        info = users.find_one({'user_id': user_id})
+
+        if info['losses'] != 0:
+            wl = round(info['wins'] / info['losses'], 2)
+            users.update_one(filter={'user_id': user_id},
+                             update={'$set': {'WL': wl if wl != int(wl) else int(wl)}})
+
+        if info['max_win_streak'] < info['win_streak']:
+            users.update_one(filter={'user_id': user_id},
+                             update={'$set': {'max_win_streak': info['win_streak']}})
+
         await state.clear()
     else:
         await state.update_data(text_word=text_word)
