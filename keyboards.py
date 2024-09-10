@@ -8,5 +8,6 @@ class Keyboards:
     def main_menu() -> ReplyKeyboardMarkup:
         builder = ReplyKeyboardBuilder()
         builder.add(KeyboardButton(text=Strings.START_GAME_BUTTON))
+        builder.add(KeyboardButton(text=Strings.PROFILE_BUTTON))
         return builder.as_markup(resize_keyboard=True,
                                  one_time_keyboard=True)

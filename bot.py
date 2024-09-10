@@ -38,7 +38,21 @@ async def command_start_handler(message: Message) -> None:
     full_name = message.from_user.full_name
     if not users.find_one({'user_id': user_id}):
         users.insert_one({'user_id': user_id, 'full_name': full_name,
-                          'wins': 0, 'losses': 0, 'WL': 0, 'used_words': []})
+                          'wins': 0, 'losses': 0, 'WL': 0,
+                          'win_streak': 0, 'max_win_streak': 0, 'used_words': []})
+
+
+@dp.message(F.text == Strings.PROFILE_BUTTON)
+async def profile_handler(message: Message):
+    user_id = message.from_user.id
+    info = users.find_one({'user_id': user_id})
+    await message.answer(text=f'Имя: {info['full_name']}\n'
+                              f'Количество побед: {info['wins']}\n'
+                              f'Количество поражений: {info['losses']}\n'
+                              f'Победы/Поражения: {info['WL']}\n'
+                              f'Текущая серия побед: {info['win_streak']}\n'
+                              f'Максимальная серия побед: {info['max_win_streak']}',
+                         reply_markup=Keyboards.main_menu())
 
 
 @dp.message(F.text == Strings.START_GAME_BUTTON)
