@@ -3,9 +3,10 @@ from random import choice
 from aiogram import F, Bot, Router
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove
 
-from bot import users, GameProcess
+from config import users
 from hangs import stages
 from keyboards import Keyboards
 from stickers import win_stickers
@@ -15,6 +16,10 @@ from words import words
 
 
 router = Router()
+
+
+class GameProcess(StatesGroup):
+    game = State()
 
 
 @router.message(CommandStart())
@@ -37,7 +42,7 @@ async def profile_handler(message: Message):
     await message.answer(text=f'Имя: {info['full_name']}\n'
                               f'Количество побед: {info['wins']}\n'
                               f'Количество поражений: {info['losses']}\n'
-                              f'Победы/Поражения: {info['WL']}\n'
+                              f'Винрейт: {info['WL']}\n'
                               f'Текущая серия побед: {info['win_streak']}\n'
                               f'Максимальная серия побед: {info['max_win_streak']}',
                          reply_markup=Keyboards.main_menu())
@@ -169,5 +174,3 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
 @router.message()
 async def message_deleter(message: Message):
     await message.delete()
-
-
