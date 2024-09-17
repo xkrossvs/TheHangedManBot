@@ -11,6 +11,7 @@ def is_it_a_win(word, text_word):
 
 
 def leaderboard_generate(type: str):
+    """Список возможных аргументов: max_win_streak, wins, WL."""
     users_wins = users.find().sort(type, -1)
     user_leader_board = [[document['full_name'], document[type]] for document in users_wins]
     message_text = Strings.LEADERS_TEXT[type]

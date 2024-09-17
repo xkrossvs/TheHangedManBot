@@ -10,4 +10,9 @@ class Strings:
         'WL': 'Рейтинг по винрейту:\n\n',
         'max_win_streak': 'Рейтинг по винстрику:\n\n'
     }
+    LEADERS_KEYBOARDS = {
+        'wins': f'{WIN_LEADER_BOARD}',
+        'WL': f'{WL_LEADER_BOARD}',
+        'max_win_streak': f'{MWS_LEADER_BOARD}'
+    }
     CYRILLIC_LETTERS = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
