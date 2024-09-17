@@ -14,4 +14,7 @@ router = Router()
 
 @router.message(F.text == Strings.LEADER_BOARD_BUTTON)
 async def leader_board_message(message: Message):
-    await message.answer(text=leaderboard_generate('wins'))
+    await message.answer(text=leaderboard_generate('wins'),
+                         reply_markup=Keyboards.leader_board())
+
+

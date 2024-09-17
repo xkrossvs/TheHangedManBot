@@ -1,5 +1,5 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from strings import Strings
 
 
@@ -13,3 +13,16 @@ class Keyboards:
         builder.add(KeyboardButton(text=Strings.LEADER_BOARD_BUTTON))
         return builder.as_markup(resize_keyboard=True,
                                  one_time_keyboard=True)
+
+
+    @staticmethod
+    def leader_board() -> InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        builder.add(InlineKeyboardButton(text=Strings.WIN_LEADER_BOARD,
+                                         callback_data=Strings.WIN_LEADER_BOARD))
+        builder.add(InlineKeyboardButton(text=Strings.WL_LEADER_BOARD,
+                                         callback_data=Strings.WL_LEADER_BOARD))
+        builder.add(InlineKeyboardButton(text=Strings.MWS_LEADER_BOARD,
+                                         callback_data=Strings.MWS_LEADER_BOARD))
+        builder.adjust(1, 2)
+        return builder.as_markup()
