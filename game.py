@@ -39,15 +39,15 @@ async def command_start_handler(message: Message) -> None:
 async def profile_handler(message: Message):
     user_id = message.from_user.id
     info = users.find_one({'user_id': user_id})
-    await message.answer(text=f'Имя: {info['full_name']}\n\n'
-                              f'Количество побед: {info['wins']}\n'
-                              f'Количество поражений: {info['losses']}\n'
-                              f'Винрейт: {info['WL']}\n'
-                              f'Текущая серия побед: {info['win_streak']}\n'
-                              f'Максимальная серия побед: {info['max_win_streak']}\n\n'
-                              f'Место в рейтинге по победам: {find_place('wins', user_id)}\n'
-                              f'Место в рейтинге по винрейту: {find_place('WL', user_id)}\n'
-                              f'Место в рейтинге по винстрику: {find_place('max_win_streak', user_id)}',
+    await message.answer(text=f'Имя: {info["full_name"]}\n\n'
+                              f'Количество побед: {info["wins"]}\n'
+                              f'Количество поражений: {info["losses"]}\n'
+                              f'Винрейт: {info["WL"]}\n'
+                              f'Текущая серия побед: {info["win_streak"]}\n'
+                              f'Максимальная серия побед: {info["max_win_streak"]}\n\n'
+                              f'Место в рейтинге по победам: {find_place("wins", user_id)}\n'
+                              f'Место в рейтинге по винрейту: {find_place("WL", user_id)}\n'
+                              f'Место в рейтинге по винстрику: {find_place("max_win_streak", user_id)}',
                          reply_markup=Keyboards.main_menu())
 
 
@@ -71,7 +71,7 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     await state.update_data(wrong_letters=wrong_letters)
     answer = await message.answer(text=f'Загадано слово из {len(word)} букв.\n'
                                        f'У вас есть право на 5 ошибок.\n\n'
-                                       f'{' '.join(text_word)}\n'
+                                       f'{" ".join(text_word)}\n'
                                        f'{STAGES[hang_state]}')
     users.update_one(filter={'user_id': user_id},
                      update={'$push': {'used_words': word}})
@@ -107,9 +107,9 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
             await bot.edit_message_text(text=f'Вы не отгадали букву.\n'
                                              f'Сожалею, вы на 1 шаг ближе к поражению.\n\n'
                                              f'Осталось прав на ошибку: {6 + hang_state}\n\n'
-                                             f'{' '.join(text_word)}\n\n'
+                                             f'{" ".join(text_word)}\n\n'
                                              f'{STAGES[hang_state]}\n\n'
-                                             f'Неправильные буквы: {' '.join(wrong_letters)}',
+                                             f'Неправильные буквы: {" ".join(wrong_letters)}',
                                         chat_id=chat_id,
                                         message_id=message_id)
         else:
@@ -119,7 +119,7 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
                                       f'Слово было: {word}\n'
                                       f'Начните сначала.\n\n'
                                       f'{STAGES[hang_state]}\n\n'
-                                      f'Неправильные буквы: {' '.join(wrong_letters)}',
+                                      f'Неправильные буквы: {" ".join(wrong_letters)}',
                                  reply_markup=Keyboards.main_menu())
 
             users.update_one(filter={'user_id': user_id},
@@ -144,7 +144,7 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
                                   f'Вы угадали слово: {word}\n'
                                   f'Начните сначала.\n\n'
                                   f'{STAGES[hang_state]}\n\n'
-                                  f'Неправильные буквы: {' '.join(wrong_letters)}',
+                                  f'Неправильные буквы: {" ".join(wrong_letters)}',
                              message_effect_id='5046509860389126442',
                              reply_markup=Keyboards.main_menu())
 
@@ -167,9 +167,9 @@ async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
         await bot.edit_message_text(text=f'Вы отгадали букву.\n'
                                          f'Поздравляю, вы на 1 шаг ближе к победе.\n\n'
                                          f'Осталось прав на ошибку: {6 + hang_state}\n\n'
-                                         f'{' '.join(text_word)}\n\n'
+                                         f'{" ".join(text_word)}\n\n'
                                          f'{STAGES[hang_state]}\n\n'
-                                         f'Неправильные буквы: {' '.join(wrong_letters)}',
+                                         f'Неправильные буквы: {" ".join(wrong_letters)}',
                                     chat_id=chat_id,
                                     message_id=message_id)
 
