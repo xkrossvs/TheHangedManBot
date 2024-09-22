@@ -15,10 +15,13 @@ class Keyboards:
                                  one_time_keyboard=True)
 
     @staticmethod
-    def leader_board(buttons: list) -> InlineKeyboardMarkup:
+    def leader_board() -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
-        for key in buttons:
-            builder.add(InlineKeyboardButton(text=Strings.LEADERS_KEYBOARDS[key],
-                                             callback_data=Strings.LEADERS_KEYBOARDS[key]))
-        builder.adjust(*(1, 2) if len(buttons) == 3 else (2,))
+        builder.add(InlineKeyboardButton(text=Strings.WIN_LEADER_BOARD,
+                                         callback_data=Strings.WIN_LEADER_BOARD))
+        builder.add(InlineKeyboardButton(text=Strings.WL_LEADER_BOARD,
+                                         callback_data=Strings.WL_LEADER_BOARD))
+        builder.add(InlineKeyboardButton(text=Strings.MWS_LEADER_BOARD,
+                                         callback_data=Strings.MWS_LEADER_BOARD))
+        builder.adjust(1, 2)
         return builder.as_markup()
