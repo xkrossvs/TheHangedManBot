@@ -1,7 +1,7 @@
 from random import choice
 
 from aiogram import F, Bot, Router
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove
@@ -35,6 +35,7 @@ async def command_start_handler(message: Message) -> None:
                           'win_streak': 0, 'max_win_streak': 0, 'used_words': []})
 
 
+@router.message(Command('profile'))
 @router.message(F.text == Strings.PROFILE_BUTTON)
 async def profile_handler(message: Message):
     user_id = message.from_user.id
@@ -51,6 +52,7 @@ async def profile_handler(message: Message):
                          reply_markup=Keyboards.main_menu())
 
 
+@router.message(Command('start_game'))
 @router.message(F.text == Strings.START_GAME_BUTTON)
 async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> None:
     loading_message = await message.answer(text='Загрузка...',

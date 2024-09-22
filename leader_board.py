@@ -1,7 +1,7 @@
 from aiogram.exceptions import TelegramBadRequest
 
 from units import leaderboard_generate
-
+from aiogram.filters import Command
 from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery
 from keyboards import Keyboards
@@ -11,6 +11,7 @@ from strings import Strings
 router = Router()
 
 
+@router.message(Command('leader_board'))
 @router.message(F.text == Strings.LEADER_BOARD_BUTTON)
 async def leader_board_message(message: Message):
     await message.answer(text='Выберите рейтинг, который хотите посмотреть:',

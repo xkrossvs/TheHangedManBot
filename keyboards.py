@@ -10,7 +10,9 @@ class Keyboards:
         builder = ReplyKeyboardBuilder()
         builder.add(KeyboardButton(text=Strings.START_GAME_BUTTON))
         builder.add(KeyboardButton(text=Strings.PROFILE_BUTTON))
+        builder.add(KeyboardButton(text=Strings.ACHIEVEMENTS_BUTTON))
         builder.add(KeyboardButton(text=Strings.LEADER_BOARD_BUTTON))
+        builder.adjust(1, 3)
         return builder.as_markup(resize_keyboard=True,
                                  one_time_keyboard=True)
 
