@@ -19,8 +19,8 @@ dp = Dispatcher(storage=storage)
 async def main() -> None:
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp.include_router(leader_board.router)
-    dp.include_router(game.router)
     dp.include_router(achievements.router)
+    dp.include_router(game.router)
     await set_commands(bot)
     await dp.start_polling(bot)
 

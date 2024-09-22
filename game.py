@@ -52,7 +52,7 @@ async def profile_handler(message: Message):
                          reply_markup=Keyboards.main_menu())
 
 
-@router.message(Command('start_game'))
+@router.message(Command('new_game'))
 @router.message(F.text == Strings.START_GAME_BUTTON)
 async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> None:
     loading_message = await message.answer(text='Загрузка...',
