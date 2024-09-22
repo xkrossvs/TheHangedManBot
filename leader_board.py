@@ -1,3 +1,5 @@
+from aiogram.exceptions import TelegramBadRequest
+
 from units import leaderboard_generate
 
 from aiogram import F, Router
@@ -17,17 +19,26 @@ async def leader_board_message(message: Message):
 
 @router.callback_query(F.data == Strings.WIN_LEADER_BOARD)
 async def win_leader_board_message(callback: CallbackQuery):
-    await callback.message.edit_text(text=leaderboard_generate('wins'),
-                                     reply_markup=Keyboards.leader_board())
+    try:
+        await callback.message.edit_text(text=leaderboard_generate('wins'),
+                                         reply_markup=Keyboards.leader_board())
+    except TelegramBadRequest:
+        await callback.answer('Вы и так здесь находитесь.')
 
 
 @router.callback_query(F.data == Strings.WL_LEADER_BOARD)
 async def win_leader_board_message(callback: CallbackQuery):
-    await callback.message.edit_text(text=leaderboard_generate('WL'),
-                                     reply_markup=Keyboards.leader_board())
+    try:
+        await callback.message.edit_text(text=leaderboard_generate('WL'),
+                                         reply_markup=Keyboards.leader_board())
+    except TelegramBadRequest:
+        await callback.answer('Вы и так здесь находитесь.')
 
 
 @router.callback_query(F.data == Strings.MWS_LEADER_BOARD)
 async def win_leader_board_message(callback: CallbackQuery):
-    await callback.message.edit_text(text=leaderboard_generate('max_win_streak'),
-                                     reply_markup=Keyboards.leader_board())
+    try:
+        await callback.message.edit_text(text=leaderboard_generate('max_win_streak'),
+                                         reply_markup=Keyboards.leader_board())
+    except TelegramBadRequest:
+        await callback.answer('Вы и так здесь находитесь.')
