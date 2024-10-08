@@ -2,7 +2,12 @@ from config import users
 from strings import Strings
 
 
-def find_all_indices(word, char):
+def find_all_indices(word: str, char: str) -> list[int]:
+    """
+    :param word: загаданное слово
+    :param char: отгаданная буква
+    :return: индексы отгаданных букв в загаданном слове
+    """
     return [i for i, letter in enumerate(word) if letter == char]
 
 
