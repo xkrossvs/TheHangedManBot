@@ -10,7 +10,7 @@ from config import users
 from hangs import STAGES
 from keyboards import Keyboards
 from stickers import win_stickers
-from strings import Strings
+from strings import Strings, Game
 from units import find_all_indices, is_it_a_win, find_place
 from words import words
 from filters import IsThereALetter
@@ -94,11 +94,9 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
 
     if is_it_a_win(data['word'], data['text_word']):
         await bot.send_sticker(data['chat_id'], choice(win_stickers))
-        await message.answer(text=f'Вы выиграли. :)\n'
-                                  f'Вы угадали слово: {data['word']}\n'
-                                  f'Начните сначала.\n\n'
-                                  f'{STAGES[data['hang_state']]}\n\n'
-                                  f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
+        await message.answer(text=Game.WIN_TEXT.format(word=data['word'],
+                                                       hang_state=STAGES[data['hang_state']],
+                                                       wrong_letters=" ".join(data['wrong_letters'])),
                              message_effect_id='5046509860389126442',
                              reply_markup=Keyboards.main_menu())
 

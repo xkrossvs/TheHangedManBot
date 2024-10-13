@@ -17,3 +17,11 @@ class Strings:
         'max_win_streak': f'{MWS_LEADER_BOARD}'
     }
     CYRILLIC_LETTERS = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
+
+
+class Game:
+    WIN_TEXT = ('Вы выиграли. :)\n'
+               'Вы угадали слово: {word}\n'
+               'Начните сначала.\n\n'
+               '{hang_state}\n\n'
+               'Неправильные буквы: {wrong_letters}')
