@@ -1,17 +1,22 @@
 from aiogram.filters import BaseFilter
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
+from typing import TypedDict
+
+
+class StatesData(TypedDict):
+    word: str
+    chat_id: int
+    text_word: list
+    hang_state: int
+    wrong_letters: str
+    message_id: int
 
 
 class IsThereALetter(BaseFilter):
     async def __call__(self, message: Message, state: FSMContext):
         data = await state.get_data()
         if message.text.upper() in data['word']:
-            return {'word': data['word'],
-                    'chat_id': data['chat_id'],
-                    'text_word': data['text_word'],
-                    'hang_state': data['hang_state'],
-                    'wrong_letters': data['wrong_letters'],
-                    'message_id': data['message_id']}
+            return data
         else:
             return False

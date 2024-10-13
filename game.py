@@ -84,29 +84,21 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     await state.set_state(GameProcess.game)
 
 
-@router.message(IsThereALetter())
-async def right_letter(message: Message,
-                       bot: Bot,
-                       state: FSMContext,
-                       word: str,
-                       chat_id: int,
-                       text_word: list,
-                       hang_state: int,
-                       wrong_letters: str,
-                       message_id: int):
+@router.message(IsThereALetter(), F.text.len() == 1, GameProcess.game)
+async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
     user_id = message.from_user.id
     letter = message.text.upper()
     await message.delete()
-    for i in find_all_indices(word, letter):
-        text_word[i] = letter
+    for i in find_all_indices(data['word'], letter):
+        data['text_word'][i] = letter
 
-    if is_it_a_win(word, text_word):
-        await bot.send_sticker(chat_id, choice(win_stickers))
+    if is_it_a_win(data['word'], data['text_word']):
+        await bot.send_sticker(data['chat_id'], choice(win_stickers))
         await message.answer(text=f'Вы выиграли. :)\n'
-                                  f'Вы угадали слово: {word}\n'
+                                  f'Вы угадали слово: {data['word']}\n'
                                   f'Начните сначала.\n\n'
-                                  f'{STAGES[hang_state]}\n\n'
-                                  f'Неправильные буквы: {" ".join(wrong_letters)}',
+                                  f'{STAGES[data['hang_state']]}\n\n'
+                                  f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
                              message_effect_id='5046509860389126442',
                              reply_markup=Keyboards.main_menu())
 
@@ -125,15 +117,15 @@ async def right_letter(message: Message,
 
         await state.clear()
     else:
-        await state.update_data(text_word=text_word)
+        await state.update_data(text_word=data['text_word'])
         await bot.edit_message_text(text=f'Вы отгадали букву.\n'
                                          f'Поздравляю, вы на 1 шаг ближе к победе.\n\n'
-                                         f'Осталось прав на ошибку: {6 + hang_state}\n\n'
-                                         f'{" ".join(text_word)}\n\n'
-                                         f'{STAGES[hang_state]}\n\n'
-                                         f'Неправильные буквы: {" ".join(wrong_letters)}',
-                                    chat_id=chat_id,
-                                    message_id=message_id)
+                                         f'Осталось прав на ошибку: {6 + data['hang_state']}\n\n'
+                                         f'{" ".join(data['text_word'])}\n\n'
+                                         f'{STAGES[data['hang_state']]}\n\n'
+                                         f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
+                                    chat_id=data['chat_id'],
+                                    message_id=data['message_id'])
 
 
 @router.message(F.text.len() == 1, F.text.upper().in_(Strings.CYRILLIC_LETTERS), GameProcess.game)
