@@ -15,6 +15,7 @@ from units import find_all_indices, is_it_a_win, find_place
 from words import words
 from filters import IsTheLetterRight, IsTheLetterWrong
 from mongo_units import MongoUnits
+from achievement_units import AchievementUnits
 
 router = Router()
 
@@ -123,35 +124,35 @@ async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
     user_id = message.from_user.id
     letter = message.text.upper()
 
-    if letter not in data['word']:
-        if letter in data['wrong_letters']:
-            return
-        data['wrong_letters'].append(letter)
-        await state.update_data(wrong_letters=data['wrong_letters'])
-        data['hang_state'] -= 1
-        await state.update_data(hang_state=data['hang_state'])
-        if data['hang_state'] != -7:
-            await bot.edit_message_text(text=f'Вы не отгадали букву.\n'
-                                             f'Сожалею, вы на 1 шаг ближе к поражению.\n\n'
-                                             f'Осталось прав на ошибку: {6 + data['hang_state']}\n\n'
-                                             f'{" ".join(data['text_word'])}\n\n'
-                                             f'{STAGES[data['hang_state']]}\n\n'
-                                             f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
-                                        chat_id=data['chat_id'],
-                                        message_id=data['message_id'])
-        else:
-            await message.delete()
-            await message.answer(text=f'Вы проиграли. :(\n'
-                                      f'Слово было: {data['word']}\n'
-                                      f'Начните сначала.\n\n'
-                                      f'{STAGES[data['hang_state']]}\n\n'
-                                      f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
-                                 reply_markup=Keyboards.main_menu())
+    if letter in data['wrong_letters']:
+        return
+    data['wrong_letters'].append(letter)
+    await state.update_data(wrong_letters=data['wrong_letters'])
+    data['hang_state'] -= 1
+    await state.update_data(hang_state=data['hang_state'])
+    if data['hang_state'] != -7:
+        await bot.edit_message_text(text=f'Вы не отгадали букву.\n'
+                                         f'Сожалею, вы на 1 шаг ближе к поражению.\n\n'
+                                         f'Осталось прав на ошибку: {6 + data['hang_state']}\n\n'
+                                         f'{" ".join(data['text_word'])}\n\n'
+                                         f'{STAGES[data['hang_state']]}\n\n'
+                                         f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
+                                    chat_id=data['chat_id'],
+                                    message_id=data['message_id'])
+    else:
+        await bot.delete_message(chat_id=data['chat_id'], message_id=data['message_id'])
+        await message.answer(text=f'Вы проиграли. :(\n'
+                                  f'Слово было: {data['word']}\n'
+                                  f'Начните сначала.\n\n'
+                                  f'{STAGES[data['hang_state']]}\n\n'
+                                  f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
+                             reply_markup=Keyboards.main_menu())
+        await AchievementUnits.complete_disaster_check(data, bot)
 
-            MongoUnits.lose_count_increase(user_id)
-            MongoUnits.wl_negative_update(user_id)
+        MongoUnits.lose_count_increase(user_id)
+        MongoUnits.wl_negative_update(user_id)
 
-            await state.clear()
+        await state.clear()
 
 
 @router.message()
