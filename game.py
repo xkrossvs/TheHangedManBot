@@ -14,6 +14,7 @@ from strings import Strings, Game
 from units import find_all_indices, is_it_a_win, find_place
 from words import words
 from filters import IsThereALetter
+from mongo_units import MongoUnits
 
 router = Router()
 
@@ -102,16 +103,7 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
 
         users.update_one(filter={'user_id': user_id},
                          update={'$inc': {'wins': 1, 'win_streak': 1}})
-        info = users.find_one({'user_id': user_id})
-
-        if info['losses'] != 0:
-            wl = round(info['wins'] / info['losses'], 2)
-            users.update_one(filter={'user_id': user_id},
-                             update={'$set': {'WL': wl if wl != int(wl) else int(wl)}})
-
-        if info['max_win_streak'] < info['win_streak']:
-            users.update_one(filter={'user_id': user_id},
-                             update={'$set': {'max_win_streak': info['win_streak']}})
+        MongoUnits.wl_and_mws_update(user_id)
 
         await state.clear()
     else:
