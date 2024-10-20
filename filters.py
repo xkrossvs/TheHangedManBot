@@ -13,10 +13,19 @@ class StatesData(TypedDict):
     message_id: int
 
 
-class IsThereALetter(BaseFilter):
+class IsTheLetterRight(BaseFilter):
     async def __call__(self, message: Message, state: FSMContext):
         data = await state.get_data()
         if message.text.upper() in data['word']:
+            return data
+        else:
+            return False
+
+
+class IsTheLetterWrong(BaseFilter):
+    async def __call__(self, message: Message, state: FSMContext):
+        data = await state.get_data()
+        if message.text.upper() not in data['word']:
             return data
         else:
             return False

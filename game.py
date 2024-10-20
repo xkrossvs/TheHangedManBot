@@ -13,7 +13,7 @@ from stickers import win_stickers
 from strings import Strings, Game
 from units import find_all_indices, is_it_a_win, find_place
 from words import words
-from filters import IsThereALetter
+from filters import IsTheLetterRight, IsTheLetterWrong
 from mongo_units import MongoUnits
 
 router = Router()
@@ -85,7 +85,7 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     await state.set_state(GameProcess.game)
 
 
-@router.message(IsThereALetter(), F.text.len() == 1, GameProcess.game)
+@router.message(IsTheLetterRight(), F.text.len() == 1, GameProcess.game)
 async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
     user_id = message.from_user.id
     letter = message.text.upper()
@@ -118,42 +118,35 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
                                     message_id=data['message_id'])
 
 
-@router.message(F.text.len() == 1, F.text.upper().in_(Strings.CYRILLIC_LETTERS), GameProcess.game)
-async def letter_catcher(message: Message, state: FSMContext, bot: Bot):
+@router.message(IsTheLetterWrong(), F.text.len() == 1, GameProcess.game)
+async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
     await message.delete()
     user_id = message.from_user.id
     letter = message.text.upper()
-    data = await state.get_data()
-    word = data['word']
-    chat_id = data['chat_id']
-    message_id = data['message_id']
-    text_word = data['text_word']
-    hang_state = data['hang_state']
-    wrong_letters = data['wrong_letters']
 
-    if letter not in word:
-        if letter in wrong_letters:
+    if letter not in data['word']:
+        if letter in data['wrong_letters']:
             return
-        wrong_letters.append(letter)
-        await state.update_data(wrong_letters=wrong_letters)
-        hang_state -= 1
-        await state.update_data(hang_state=hang_state)
-        if hang_state != -7:
+        data['wrong_letters'].append(letter)
+        await state.update_data(wrong_letters=data['wrong_letters'])
+        data['hang_state'] -= 1
+        await state.update_data(hang_state=data['hang_state'])
+        if data['hang_state'] != -7:
             await bot.edit_message_text(text=f'Вы не отгадали букву.\n'
                                              f'Сожалею, вы на 1 шаг ближе к поражению.\n\n'
-                                             f'Осталось прав на ошибку: {6 + hang_state}\n\n'
-                                             f'{" ".join(text_word)}\n\n'
-                                             f'{STAGES[hang_state]}\n\n'
-                                             f'Неправильные буквы: {" ".join(wrong_letters)}',
-                                        chat_id=chat_id,
-                                        message_id=message_id)
+                                             f'Осталось прав на ошибку: {6 + data['hang_state']}\n\n'
+                                             f'{" ".join(data['text_word'])}\n\n'
+                                             f'{STAGES[data['hang_state']]}\n\n'
+                                             f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
+                                        chat_id=data['chat_id'],
+                                        message_id=data['message_id'])
         else:
             await message.delete()
             await message.answer(text=f'Вы проиграли. :(\n'
-                                      f'Слово было: {word}\n'
+                                      f'Слово было: {data['word']}\n'
                                       f'Начните сначала.\n\n'
-                                      f'{STAGES[hang_state]}\n\n'
-                                      f'Неправильные буквы: {" ".join(wrong_letters)}',
+                                      f'{STAGES[data['hang_state']]}\n\n'
+                                      f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
                                  reply_markup=Keyboards.main_menu())
 
             users.update_one(filter={'user_id': user_id},
