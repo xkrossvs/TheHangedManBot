@@ -101,8 +101,7 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
                              message_effect_id='5046509860389126442',
                              reply_markup=Keyboards.main_menu())
 
-        users.update_one(filter={'user_id': user_id},
-                         update={'$inc': {'wins': 1, 'win_streak': 1}})
+        MongoUnits.win_count_increase(user_id)
         MongoUnits.wl_and_mws_update(user_id)
 
         await state.clear()
@@ -149,14 +148,8 @@ async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
                                       f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
                                  reply_markup=Keyboards.main_menu())
 
-            users.update_one(filter={'user_id': user_id},
-                             update={'$inc': {'losses': 1},
-                                     '$set': {'win_streak': 0}})
-            info = users.find_one({'user_id': user_id})
-
-            wl = round(info['wins'] / info['losses'], 2)
-            users.update_one(filter={'user_id': user_id},
-                             update={'$set': {'WL': wl if wl != int(wl) else int(wl)}})
+            MongoUnits.lose_count_increase(user_id)
+            MongoUnits.wl_negative_update(user_id)
 
             await state.clear()
 
