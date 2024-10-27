@@ -16,6 +16,7 @@ from words import words
 from filters import IsTheLetterRight, IsTheLetterWrong
 from mongo_units import MongoUnits
 from achievement_units import AchievementUnits
+from constants import ACHIEVEMENTS
 
 router = Router()
 
@@ -34,7 +35,8 @@ async def command_start_handler(message: Message) -> None:
     if not users.find_one({'user_id': user_id}):
         users.insert_one({'user_id': user_id, 'full_name': full_name,
                           'wins': 0, 'losses': 0, 'WL': 0,
-                          'win_streak': 0, 'max_win_streak': 0, 'used_words': []})
+                          'win_streak': 0, 'max_win_streak': 0, 'used_words': [],
+                          'achievements': ACHIEVEMENTS})
 
 
 @router.message(Command('profile'))
