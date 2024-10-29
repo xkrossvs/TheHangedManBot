@@ -1,8 +1,8 @@
 from aiogram.filters import Command
 from aiogram import F, Router
-from aiogram.types import Message, CallbackQuery
-from keyboards import Keyboards
+from aiogram.types import Message
 from strings import Strings
+from achievement_units import AchievementUnits
 
 router = Router()
 
@@ -10,4 +10,5 @@ router = Router()
 @router.message(Command('achievements'))
 @router.message(F.text == Strings.ACHIEVEMENTS_BUTTON)
 async def achievements_menu(message: Message):
-    await message.answer(text='тут будут достижения')
+    user_id = message.from_user.id
+    await message.answer(text=AchievementUnits.achievements_generator(user_id))
