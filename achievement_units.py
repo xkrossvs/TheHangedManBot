@@ -1,6 +1,10 @@
 from config import users, StatesData
 from aiogram import Bot
 
+NOTIFICATION = ('✅ Получено достижение!\n\n'
+                '<b>{name}</b>\n'
+                '<i>{description}</i>')
+
 
 class AchievementUnits:
 
@@ -17,17 +21,19 @@ class AchievementUnits:
     @staticmethod
     async def complete_disaster_check(data: StatesData, bot: Bot):
         user_id = data['chat_id']
-        achievements = users.find_one(filter={'user_id': user_id})['achievements']
-        if achievements['🥀 Полный Провал'][0]:
+        user = users.find_one(filter={'user_id': user_id})
+        name = '🥀 Полный Провал'
+        achievement = user['achievements'][name]
+
+        if achievement[0]:
             return
+
         if ''.join(data['text_word']).count('_') == len(data['word']):
-            achievements['🥀 Полный Провал'][0] = 1
+            achievement[0] = 1
             await bot.send_message(chat_id=data['chat_id'],
-                                   text='✅ Получено достижение!\n\n'
-                                        '<b>🥀 Полный Провал</b>\n'
-                                        '<i>Проиграть, не угадав ни одной буквы</i>')
+                                   text=NOTIFICATION.format(name=name, description=achievement[2]))
             users.update_one(filter={'user_id': user_id},
-                             update={'$set': {'achievements': achievements}})
+                             update={'$set': {f'achievements.{name}': achievement}})
 
     @staticmethod
     async def success_series_check(data: StatesData, bot: Bot):
@@ -43,9 +49,7 @@ class AchievementUnits:
         achievement[0] = win_streak
         if achievement[0] == achievement[1]:
             await bot.send_message(chat_id=data['chat_id'],
-                                   text=f'✅ Получено достижение!\n\n'
-                                        f'<b>{name}</b>\n'
-                                        f'<i>{achievement[2]}</i>')
+                                   text=NOTIFICATION.format(name=name, description=achievement[2]))
             users.update_one(filter={'user_id': user_id},
                              update={'$set': {f'achievements.{name}': achievement}})
 
@@ -63,8 +67,6 @@ class AchievementUnits:
         achievement[0] = win_streak
         if achievement[0] == achievement[1]:
             await bot.send_message(chat_id=data['chat_id'],
-                                   text=f'✅ Получено достижение!\n\n'
-                                        f'<b>{name}</b>\n'
-                                        f'<i>{achievement[2]}</i>')
+                                   text=NOTIFICATION.format(name=name, description=achievement[2]))
             users.update_one(filter={'user_id': user_id},
                              update={'$set': {f'achievements.{name}': achievement}})
