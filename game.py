@@ -155,6 +155,8 @@ async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
                                   f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
                              reply_markup=Keyboards.main_menu())
         await AchievementUnits.complete_disaster_check(data, bot)
+        await AchievementUnits.success_series_check(data, bot)
+        await AchievementUnits.champion_series_check(data, bot)
 
         MongoUnits.lose_count_increase(user_id)
         MongoUnits.wl_negative_update(user_id)
