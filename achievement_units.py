@@ -47,11 +47,11 @@ class AchievementUnits:
             return
 
         achievement[0] = win_streak
+        users.update_one(filter={'user_id': user_id},
+                         update={'$set': {f'achievements.{name}': achievement}})
         if achievement[0] == achievement[1]:
             await bot.send_message(chat_id=data['chat_id'],
                                    text=NOTIFICATION.format(name=name, description=achievement[2]))
-            users.update_one(filter={'user_id': user_id},
-                             update={'$set': {f'achievements.{name}': achievement}})
 
     @staticmethod
     async def champion_series_check(data: StatesData, bot: Bot):
@@ -65,8 +65,8 @@ class AchievementUnits:
             return
 
         achievement[0] = win_streak
+        users.update_one(filter={'user_id': user_id},
+                         update={'$set': {f'achievements.{name}': achievement}})
         if achievement[0] == achievement[1]:
             await bot.send_message(chat_id=data['chat_id'],
                                    text=NOTIFICATION.format(name=name, description=achievement[2]))
-            users.update_one(filter={'user_id': user_id},
-                             update={'$set': {f'achievements.{name}': achievement}})
