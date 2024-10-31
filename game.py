@@ -56,6 +56,7 @@ async def profile_handler(message: Message):
                          reply_markup=Keyboards.main_menu())
 
 
+# TODO: исключить попытки выйти из игры во время угадывания
 @router.message(Command('new_game'))
 @router.message(F.text == Strings.START_GAME_BUTTON)
 async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> None:
@@ -68,6 +69,8 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     word = choice(words)
     while word in used_words:
         word = choice(words)
+    print(word)
+    # TODO: убрать принт после разработки
     await state.update_data(word=word)
     text_word = ['_'] * len(word)
     await state.update_data(text_word=text_word)
@@ -106,6 +109,8 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
 
         MongoUnits.win_count_increase(user_id)
         MongoUnits.wl_and_mws_update(user_id)
+        await AchievementUnits.success_series_check(data, bot)
+        await AchievementUnits.champion_series_check(data, bot)
 
         await state.clear()
     else:

@@ -14,7 +14,6 @@ class AchievementUnits:
                                   f'<i>{value[2]}</i>\n\n')
         return achievements_text
 
-
     @staticmethod
     async def complete_disaster_check(data: StatesData, bot: Bot):
         user_id = data['chat_id']
@@ -24,7 +23,48 @@ class AchievementUnits:
         if ''.join(data['text_word']).count('_') == len(data['word']):
             achievements['🥀 Полный Провал'][0] = 1
             await bot.send_message(chat_id=data['chat_id'],
-                                   text='Достижение получено: Полный провал.\n'
-                                        'Проиграйте игру не угадав ни одной буквы.')
+                                   text='✅ Получено достижение!\n\n'
+                                        '<b>🥀 Полный Провал</b>\n'
+                                        '<i>Проиграть, не угадав ни одной буквы</i>')
             users.update_one(filter={'user_id': user_id},
                              update={'$set': {'achievements': achievements}})
+
+    @staticmethod
+    async def success_series_check(data: StatesData, bot: Bot):
+        user_id = data['chat_id']
+        user = users.find_one(filter={'user_id': user_id})
+        win_streak = user['win_streak']
+        name = '🚀 Серия Успеха'
+        achievement = user['achievements'][name]
+
+        if achievement[0] == achievement[1]:
+            return
+
+        achievement[0] = win_streak
+        if achievement[0] == achievement[1]:
+            await bot.send_message(chat_id=data['chat_id'],
+                                   text=f'✅ Получено достижение!\n\n'
+                                        f'<b>{name}</b>\n'
+                                        f'<i>{achievement[2]}</i>')
+            users.update_one(filter={'user_id': user_id},
+                             update={'$set': {f'achievements.{name}': achievement}})
+
+    @staticmethod
+    async def champion_series_check(data: StatesData, bot: Bot):
+        user_id = data['chat_id']
+        user = users.find_one(filter={'user_id': user_id})
+        win_streak = user['win_streak']
+        name = '🥇 Чемпионская Серия'
+        achievement = user['achievements'][name]
+
+        if achievement[0] == achievement[1]:
+            return
+
+        achievement[0] = win_streak
+        if achievement[0] == achievement[1]:
+            await bot.send_message(chat_id=data['chat_id'],
+                                   text=f'✅ Получено достижение!\n\n'
+                                        f'<b>{name}</b>\n'
+                                        f'<i>{achievement[2]}</i>')
+            users.update_one(filter={'user_id': user_id},
+                             update={'$set': {f'achievements.{name}': achievement}})
