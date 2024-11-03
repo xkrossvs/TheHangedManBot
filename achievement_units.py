@@ -70,3 +70,47 @@ class AchievementUnits:
         if achievement[0] == achievement[1]:
             await bot.send_message(chat_id=data['chat_id'],
                                    text=NOTIFICATION.format(name=name, description=achievement[2]))
+
+    @staticmethod
+    async def legendary_winner_check(data: StatesData, bot: Bot):
+        user_id = data['chat_id']
+        user = users.find_one(filter={'user_id': user_id})
+        wins = user['wins']
+        name = '🐉 Легендарный Победитель'
+        achievement = user['achievements'][name]
+
+        if achievement[0] == achievement[1]:
+            return
+
+        achievement[0] = wins
+        users.update_one(filter={'user_id': user_id},
+                         update={'$set': {f'achievements.{name}': achievement}})
+        if achievement[0] == achievement[1]:
+            await bot.send_message(chat_id=data['chat_id'],
+                                   text=NOTIFICATION.format(name=name, description=achievement[2]))
+
+    @staticmethod
+    async def instant_insight_check(data: StatesData, bot: Bot):
+        user_id = data['chat_id']
+        user = users.find_one(filter={'user_id': user_id})
+        name = '💫 Мгновенное Прозрение'
+        achievement = user['achievements'][name]
+        text_word = data['text_word']
+        wrong_letters = data['wrong_letters']
+        number_of_original_letters = set(''.join(text_word).replace('_', ''))
+
+        if achievement[0] == achievement[1]:
+            return
+        if wrong_letters:
+            return
+        if text_word[0] == '_':
+            return
+        if len(number_of_original_letters) != 1:
+            return
+
+        achievement[0] = 1
+        users.update_one(filter={'user_id': user_id},
+                         update={'$set': {f'achievements.{name}': achievement}})
+        if achievement[0] == achievement[1]:
+            await bot.send_message(chat_id=data['chat_id'],
+                                   text=NOTIFICATION.format(name=name, description=achievement[2]))

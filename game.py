@@ -100,6 +100,8 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
         data['text_word'][i] = letter
 
     if is_it_a_win(data['word'], data['text_word']):
+        await bot.delete_message(chat_id=data['chat_id'],
+                                 message_id=data['message_id'])
         await bot.send_sticker(data['chat_id'], choice(win_stickers))
         await message.answer(text=Game.WIN_TEXT.format(word=data['word'],
                                                        hang_state=STAGES[data['hang_state']],
@@ -111,6 +113,7 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
         MongoUnits.wl_and_mws_update(user_id)
         await AchievementUnits.success_series_check(data, bot)
         await AchievementUnits.champion_series_check(data, bot)
+        await AchievementUnits.legendary_winner_check(data, bot)
 
         await state.clear()
     else:
@@ -123,6 +126,7 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
                                          f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
                                     chat_id=data['chat_id'],
                                     message_id=data['message_id'])
+        await AchievementUnits.instant_insight_check(data, bot)
 
 
 @router.message(IsTheLetterWrong(), F.text.len() == 1, GameProcess.game)
@@ -147,7 +151,8 @@ async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
                                     chat_id=data['chat_id'],
                                     message_id=data['message_id'])
     else:
-        await bot.delete_message(chat_id=data['chat_id'], message_id=data['message_id'])
+        await bot.delete_message(chat_id=data['chat_id'],
+                                 message_id=data['message_id'])
         await message.answer(text=f'Вы проиграли. :(\n'
                                   f'Слово было: {data['word']}\n'
                                   f'Начните сначала.\n\n'
