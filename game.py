@@ -114,6 +114,7 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
         await AchievementUnits.success_series_check(data, bot)
         await AchievementUnits.champion_series_check(data, bot)
         await AchievementUnits.legendary_winner_check(data, bot)
+        await AchievementUnits.without_a_miss_check(data, bot)
 
         await state.clear()
     else:
