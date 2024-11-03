@@ -1,5 +1,6 @@
 from config import users, StatesData
 from aiogram import Bot
+from hangs import STAGES
 
 NOTIFICATION = ('✅ Получено достижение!\n\n'
                 '<b>{name}</b>\n'
@@ -126,6 +127,26 @@ class AchievementUnits:
         if achievement[0] == achievement[1]:
             return
         if wrong_letters:
+            return
+
+        achievement[0] = 1
+        users.update_one(filter={'user_id': user_id},
+                         update={'$set': {f'achievements.{name}': achievement}})
+        if achievement[0] == achievement[1]:
+            await bot.send_message(chat_id=data['chat_id'],
+                                   text=NOTIFICATION.format(name=name, description=achievement[2]))
+
+    @staticmethod
+    async def bladerunner_check(data: StatesData, bot: Bot):
+        user_id = data['chat_id']
+        user = users.find_one(filter={'user_id': user_id})
+        name = '🔪 Бегущий По Лезвию'
+        achievement = user['achievements'][name]
+        wrong_letters = data['wrong_letters']
+
+        if achievement[0] == achievement[1]:
+            return
+        if len(wrong_letters) != len(STAGES) - 2:
             return
 
         achievement[0] = 1

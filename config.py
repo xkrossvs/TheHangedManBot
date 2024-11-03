@@ -14,5 +14,5 @@ class StatesData(TypedDict):
     chat_id: int
     text_word: list
     hang_state: int
-    wrong_letters: str
+    wrong_letters: list
     message_id: int
