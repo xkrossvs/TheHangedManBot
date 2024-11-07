@@ -2,14 +2,14 @@ class Strings:
     PROFILE_BUTTON = '👤 Профиль'
     START_GAME_BUTTON = '🕹 Начать игру'
     LEADER_BOARD_BUTTON = '🎖 Рейтинг'
-    WIN_LEADER_BOARD = 'Победы'
-    WL_LEADER_BOARD = 'Винрейт'
-    MWS_LEADER_BOARD = 'Винстрик'
+    WIN_LEADER_BOARD = '📯 Победы'
+    WL_LEADER_BOARD = '📊 Винрейт'
+    MWS_LEADER_BOARD = '🔥 Винстрик'
     ACHIEVEMENTS_BUTTON = '🧩 Достижения'
     LEADERS_TEXT = {
-        'wins': 'Рейтинг по победам:\n\n',
-        'WL': 'Рейтинг по винрейту:\n\n',
-        'max_win_streak': 'Рейтинг по винстрику:\n\n'
+        'wins': '🏆 <b>Рейтинг по победам</b>\n\n',
+        'WL': '🏆 <b>Рейтинг по винрейту</b>\n\n',
+        'max_win_streak': '🏆 <b>Рейтинг по винстрику</b>\n\n'
     }
     LEADERS_KEYBOARDS = {
         'wins': f'{WIN_LEADER_BOARD}',
@@ -17,6 +17,8 @@ class Strings:
         'max_win_streak': f'{MWS_LEADER_BOARD}'
     }
     CYRILLIC_LETTERS = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
+    LEADER_BOARD_MEDALS = ['🥇', '🥈', '🥉']
+
 
 
 class Game:

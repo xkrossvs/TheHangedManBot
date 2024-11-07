@@ -15,13 +15,14 @@ def is_it_a_win(word, text_word):
     return ''.join(text_word) == word
 
 
-def leaderboard_generate(field: str):
+def leaderboard_generate(field: str, id_user: int) -> str:
     """Список возможных аргументов: max_win_streak, wins, WL."""
     users_data = users.find().sort(field, -1)
     user_leader_board = [[document['full_name'], document[field]] for document in users_data]
     message_text = Strings.LEADERS_TEXT[field]
-    for place, info in enumerate(user_leader_board[:10]):
-        message_text += f'{place + 1}.) {info[0]}: {info[1]}\n'
+    for place, info in enumerate(user_leader_board[:3]):
+        message_text += f'{Strings.LEADER_BOARD_MEDALS[place]} <code>{info[0]}</code> ({info[1]})\n'
+    message_text += f'\nВаша позиция: <b>{find_place(field, id_user)}</b>'
     return message_text
 
 

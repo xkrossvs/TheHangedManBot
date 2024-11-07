@@ -20,8 +20,9 @@ async def leader_board_message(message: Message):
 
 @router.callback_query(F.data == Strings.WIN_LEADER_BOARD)
 async def win_leader_board_message(callback: CallbackQuery):
+    user_id = callback.from_user.id
     try:
-        await callback.message.edit_text(text=leaderboard_generate('wins'),
+        await callback.message.edit_text(text=leaderboard_generate('wins', user_id),
                                          reply_markup=Keyboards.leader_board())
     except TelegramBadRequest:
         await callback.answer('Вы и так здесь находитесь.')
@@ -29,8 +30,9 @@ async def win_leader_board_message(callback: CallbackQuery):
 
 @router.callback_query(F.data == Strings.WL_LEADER_BOARD)
 async def win_leader_board_message(callback: CallbackQuery):
+    user_id = callback.from_user.id
     try:
-        await callback.message.edit_text(text=leaderboard_generate('WL'),
+        await callback.message.edit_text(text=leaderboard_generate('WL', user_id),
                                          reply_markup=Keyboards.leader_board())
     except TelegramBadRequest:
         await callback.answer('Вы и так здесь находитесь.')
@@ -38,8 +40,9 @@ async def win_leader_board_message(callback: CallbackQuery):
 
 @router.callback_query(F.data == Strings.MWS_LEADER_BOARD)
 async def win_leader_board_message(callback: CallbackQuery):
+    user_id = callback.from_user.id
     try:
-        await callback.message.edit_text(text=leaderboard_generate('max_win_streak'),
+        await callback.message.edit_text(text=leaderboard_generate('max_win_streak', user_id),
                                          reply_markup=Keyboards.leader_board())
     except TelegramBadRequest:
         await callback.answer('Вы и так здесь находитесь.')
