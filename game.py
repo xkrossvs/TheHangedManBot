@@ -44,15 +44,17 @@ async def command_start_handler(message: Message) -> None:
 async def profile_handler(message: Message):
     user_id = message.from_user.id
     info = users.find_one({'user_id': user_id})
-    await message.answer(text=f'Имя: {info["full_name"]}\n\n'
-                              f'Количество побед: {info["wins"]}\n'
-                              f'Количество поражений: {info["losses"]}\n'
-                              f'Винрейт: {info["WL"]}\n'
-                              f'Текущая серия побед: {info["win_streak"]}\n'
-                              f'Максимальная серия побед: {info["max_win_streak"]}\n\n'
-                              f'Место в рейтинге по победам: {find_place("wins", user_id)}\n'
-                              f'Место в рейтинге по винрейту: {find_place("WL", user_id)}\n'
-                              f'Место в рейтинге по винстрику: {find_place("max_win_streak", user_id)}',
+    await message.answer(text=f'<blockquote>👤 {info["full_name"]}</blockquote>\n\n'
+                              f'〰️ <i>Статистика</i> 〰️\n\n'
+                              f'📯 Победы: <b>{info["wins"]}</b>\n'
+                              f'☠️ Поражения: <b>{info["losses"]}</b>\n'
+                              f'📊 Винрейт: <b>{info["WL"]}</b>\n'
+                              f'🔥 Винстрик: <b>{info["win_streak"]}</b>\n'
+                              f'⚡️ Максимальный винстрик: <b>{info["max_win_streak"]}</b>\n\n'
+                              f'〰️ <i>Место в рейтинге</i> 〰️\n\n'
+                              f'📯 По победам: <b>{find_place("wins", user_id)}</b>\n'
+                              f'📊 По винрейту: <b>{find_place("WL", user_id)}</b>\n'
+                              f'🔥 По винстрику: <b>{find_place("max_win_streak", user_id)}</b>',
                          reply_markup=Keyboards.main_menu())
 
 
