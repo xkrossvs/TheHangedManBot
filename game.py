@@ -81,8 +81,8 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     wrong_letters = []
     await state.update_data(wrong_letters=wrong_letters)
     answer = await message.answer(text=f'Загадано слово из {len(word)} букв.\n'
-                                       f'У вас есть право на 5 ошибок.\n\n'
-                                       f'{" ".join(text_word)}\n'
+                                       f'{Strings.LIVES[hang_state]}\n\n'
+                                       f'{" ".join(text_word).replace('_', '◻️')}\n'
                                        f'{STAGES[hang_state]}')
     users.update_one(filter={'user_id': user_id},
                      update={'$push': {'used_words': word}})
@@ -106,6 +106,7 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
                                  message_id=data['message_id'])
         await bot.send_sticker(data['chat_id'], choice(win_stickers))
         await message.answer(text=Game.WIN_TEXT.format(word=data['word'],
+                                                       lives=Strings.LIVES[data['hang_state']],
                                                        hang_state=STAGES[data['hang_state']],
                                                        wrong_letters=" ".join(data['wrong_letters'])),
                              message_effect_id='5046509860389126442',
@@ -125,8 +126,8 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
         await state.update_data(text_word=data['text_word'])
         await bot.edit_message_text(text=f'Вы отгадали букву.\n'
                                          f'Поздравляю, вы на 1 шаг ближе к победе.\n\n'
-                                         f'Осталось прав на ошибку: {6 + data['hang_state']}\n\n'
-                                         f'{" ".join(data['text_word'])}\n\n'
+                                         f'{Strings.LIVES[data['hang_state']]}\n\n'
+                                         f'{" ".join(data['text_word']).replace('_', '◻️')}\n\n'
                                          f'{STAGES[data['hang_state']]}\n\n'
                                          f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
                                     chat_id=data['chat_id'],
@@ -149,8 +150,8 @@ async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
     if data['hang_state'] != -7:
         await bot.edit_message_text(text=f'Вы не отгадали букву.\n'
                                          f'Сожалею, вы на 1 шаг ближе к поражению.\n\n'
-                                         f'Осталось прав на ошибку: {6 + data['hang_state']}\n\n'
-                                         f'{" ".join(data['text_word'])}\n\n'
+                                         f'{Strings.LIVES[data['hang_state']]}\n\n'
+                                         f'{" ".join(data['text_word']).replace('_', '◻️')}\n\n'
                                          f'{STAGES[data['hang_state']]}\n\n'
                                          f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
                                     chat_id=data['chat_id'],
@@ -159,6 +160,7 @@ async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
         await bot.delete_message(chat_id=data['chat_id'],
                                  message_id=data['message_id'])
         await message.answer(text=f'Вы проиграли. :(\n'
+                                  f'{Strings.LIVES[data['hang_state']]}\n'
                                   f'Слово было: {data['word']}\n'
                                   f'Начните сначала.\n\n'
                                   f'{STAGES[data['hang_state']]}\n\n'
