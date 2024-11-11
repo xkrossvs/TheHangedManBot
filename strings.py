@@ -33,5 +33,4 @@ class Game:
                 '{lives}\n'
                 'Вы угадали слово: {word}\n'
                 'Начните сначала.\n\n'
-                '{hang_state}\n\n'
                 'Неправильные буквы: {wrong_letters}')
