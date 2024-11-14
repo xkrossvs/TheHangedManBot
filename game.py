@@ -59,8 +59,22 @@ async def profile_handler(message: Message):
 
 
 # TODO: исключить попытки выйти из игры во время угадывания
+# TODO: доделать
 @router.message(Command('new_game'))
-@router.message(F.text == Strings.START_GAME_BUTTON)
+@router.message(F.text == Strings.NEW_GAME_BUTTON)
+async def new_game_handler(message: Message):
+    pass
+
+
+# TODO: поменять текст
+@router.message(F.text == Strings.BACK_BUTTON)
+async def main_menu_handler(message: Message) -> None:
+    await message.answer(text='Главное меню',
+                         reply_markup=Keyboards.main_menu())
+
+
+# TODO: доделать
+@router.message(F.text)
 async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> None:
     loading_message = await message.answer(text='Загрузка...',
                                            reply_markup=ReplyKeyboardRemove())

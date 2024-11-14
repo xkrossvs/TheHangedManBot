@@ -8,7 +8,7 @@ class Keyboards:
     @staticmethod
     def main_menu() -> ReplyKeyboardMarkup:
         builder = ReplyKeyboardBuilder()
-        builder.add(KeyboardButton(text=Strings.START_GAME_BUTTON))
+        builder.add(KeyboardButton(text=Strings.NEW_GAME_BUTTON))
         builder.add(KeyboardButton(text=Strings.PROFILE_BUTTON))
         builder.add(KeyboardButton(text=Strings.ACHIEVEMENTS_BUTTON))
         builder.add(KeyboardButton(text=Strings.LEADER_BOARD_BUTTON))

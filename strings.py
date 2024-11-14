@@ -1,11 +1,12 @@
 class Strings:
     PROFILE_BUTTON = '👤 Профиль'
-    START_GAME_BUTTON = '🕹 Начать игру'
+    NEW_GAME_BUTTON = '🕹 Начать игру'
     LEADER_BOARD_BUTTON = '🎖 Рейтинг'
     WIN_LEADER_BOARD = '📯 Победы'
     WL_LEADER_BOARD = '📊 Винрейт'
     MWS_LEADER_BOARD = '🔥 Винстрик'
     ACHIEVEMENTS_BUTTON = '🧩 Достижения'
+    BACK_BUTTON = '↩️ Назад'
     LEADERS_TEXT = {
         'wins': '🏆 <b>Рейтинг по победам</b>\n\n',
         'WL': '🏆 <b>Рейтинг по винрейту</b>\n\n',
