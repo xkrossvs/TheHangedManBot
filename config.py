@@ -16,3 +16,5 @@ class StatesData(TypedDict):
     hang_state: int
     wrong_letters: list
     message_id: int
+
+

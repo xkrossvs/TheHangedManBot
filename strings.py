@@ -35,3 +35,10 @@ class Game:
                 'Вы угадали слово: {word}\n'
                 'Начните сначала.\n\n'
                 'Неправильные буквы: {wrong_letters}')
+
+
+class ThemeButton:
+    WORDS = '🔤 Слова'
+    PROFESSIONS = '👷🏻 Профессии'
+    TOWNS = '🏙 Города'
+    MOVIES = '🎬 Фильмы'
