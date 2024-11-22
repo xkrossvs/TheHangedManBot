@@ -5,14 +5,14 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove, InputMediaPhoto
-
+from themes import theme_dict, theme_names
 from config import users
-from hangs import STAGES_OLD, STAGES
+from hangs import STAGES
 from keyboards import Keyboards
 from stickers import win_stickers
 from strings import Strings, Game
 from units import find_all_indices, is_it_a_win, find_place
-from words import words
+from words import get_word_list
 from filters import IsTheLetterRight, IsTheLetterWrong
 from mongo_units import MongoUnits
 from achievement_units import AchievementUnits
@@ -59,11 +59,12 @@ async def profile_handler(message: Message):
 
 
 # TODO: исключить попытки выйти из игры во время угадывания
-# TODO: доделать
+# TODO: поменять текст
 @router.message(Command('new_game'))
 @router.message(F.text == Strings.NEW_GAME_BUTTON)
 async def new_game_handler(message: Message):
-    pass
+    await message.answer(text='Выберите тему',
+                         reply_markup=Keyboards.themes())
 
 
 # TODO: поменять текст
@@ -73,15 +74,17 @@ async def main_menu_handler(message: Message) -> None:
                          reply_markup=Keyboards.main_menu())
 
 
-# TODO: доделать
-@router.message(F.text)
+@router.message(F.text.in_(theme_names))
 async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> None:
     loading_message = await message.answer(text='Загрузка...',
                                            reply_markup=ReplyKeyboardRemove())
     await bot.delete_message(chat_id=loading_message.chat.id,
                              message_id=loading_message.message_id)
     user_id = message.from_user.id
-    used_words = users.find_one({'user_id': user_id})['used_words']
+    theme = theme_dict.get(message.text)
+    words = get_word_list(theme.words)
+    # TODO: used_words в профиль
+    used_words = users.find_one({'user_id': user_id})[theme.used_words]
     word = choice(words)
     while word in used_words:
         word = choice(words)

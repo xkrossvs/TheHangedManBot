@@ -1,6 +1,7 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from strings import Strings
+from themes import theme_names
 
 
 class Keyboards:
@@ -27,3 +28,12 @@ class Keyboards:
                                          callback_data=Strings.MWS_LEADER_BOARD))
         builder.adjust(1, 2)
         return builder.as_markup()
+
+    @staticmethod
+    def themes() -> ReplyKeyboardMarkup:
+        builder = ReplyKeyboardBuilder()
+        for theme in theme_names:
+            builder.add(KeyboardButton(text=theme))
+        builder.adjust(2, 2)
+        return builder.as_markup(resize_keyboard=True,
+                                 one_time_keyboard=True)
