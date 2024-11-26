@@ -5,7 +5,7 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove, InputMediaPhoto
-from themes import theme_dict, theme_names
+from themes import THEME_DICT, THEME_NAMES, THEMES
 from config import users
 from hangs import STAGES
 from keyboards import Keyboards
@@ -33,10 +33,16 @@ async def command_start_handler(message: Message) -> None:
     user_id = message.from_user.id
     full_name = message.from_user.full_name
     if not users.find_one({'user_id': user_id}):
+        def theme_inserter(themes: list) -> dict:
+            theme_dict = {}
+            for theme in themes:
+                theme_dict[theme.used_words] = []
+            return theme_dict
+
         users.insert_one({'user_id': user_id, 'full_name': full_name,
                           'wins': 0, 'losses': 0, 'WL': 0,
-                          'win_streak': 0, 'max_win_streak': 0, 'used_words': [],
-                          'achievements': ACHIEVEMENTS})
+                          'win_streak': 0, 'max_win_streak': 0,
+                          'achievements': ACHIEVEMENTS} | theme_inserter(THEMES))
 
 
 @router.message(Command('profile'))
@@ -63,6 +69,12 @@ async def profile_handler(message: Message):
 @router.message(Command('new_game'))
 @router.message(F.text == Strings.NEW_GAME_BUTTON)
 async def new_game_handler(message: Message):
+    user_id = message.from_user.id
+    user = users.find_one(filter={'user_id': user_id})
+    for theme in THEMES:
+        if theme.used_words not in user:
+            users.update_one(filter={'user_id': user_id},
+                             update={'$set': {f'{theme.used_words}': []}})
     await message.answer(text='Выберите тему',
                          reply_markup=Keyboards.themes())
 
@@ -74,14 +86,14 @@ async def main_menu_handler(message: Message) -> None:
                          reply_markup=Keyboards.main_menu())
 
 
-@router.message(F.text.in_(theme_names))
+@router.message(F.text.in_(THEME_NAMES))
 async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> None:
     loading_message = await message.answer(text='Загрузка...',
                                            reply_markup=ReplyKeyboardRemove())
     await bot.delete_message(chat_id=loading_message.chat.id,
                              message_id=loading_message.message_id)
     user_id = message.from_user.id
-    theme = theme_dict.get(message.text)
+    theme = THEME_DICT.get(message.text)
     words = get_word_list(theme.words)
     # TODO: used_words в профиль
     used_words = users.find_one({'user_id': user_id})[theme.used_words]
@@ -102,7 +114,7 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
                                                 f'{Strings.LIVES[hang_state]}\n\n'
                                                 f'{" ".join(text_word).replace('_', '◻️')}\n')
     users.update_one(filter={'user_id': user_id},
-                     update={'$push': {'used_words': word}})
+                     update={'$push': {f'{theme.used_words}': word}})
     chat_id = answer.chat.id
     await state.update_data(chat_id=chat_id)
     message_id = answer.message_id

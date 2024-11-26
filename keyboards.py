@@ -1,7 +1,7 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from strings import Strings
-from themes import theme_names
+from themes import THEME_NAMES
 
 
 class Keyboards:
@@ -32,7 +32,7 @@ class Keyboards:
     @staticmethod
     def themes() -> ReplyKeyboardMarkup:
         builder = ReplyKeyboardBuilder()
-        for theme in theme_names:
+        for theme in THEME_NAMES:
             builder.add(KeyboardButton(text=theme))
         builder.adjust(2, 2)
         return builder.as_markup(resize_keyboard=True,
