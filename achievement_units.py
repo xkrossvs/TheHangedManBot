@@ -1,6 +1,7 @@
 from config import users, StatesData
 from aiogram import Bot
 from hangs import STAGES
+from strings import ThemeButton
 
 NOTIFICATION = ('✅ Получено достижение!\n\n'
                 '<b>{name}</b>\n'
@@ -170,6 +171,69 @@ class AchievementUnits:
             return
 
         achievement[0] = 1
+        users.update_one(filter={'user_id': user_id},
+                         update={'$set': {f'achievements.{name}': achievement}})
+        if achievement[0] == achievement[1]:
+            await bot.send_message(chat_id=data['chat_id'],
+                                   text=NOTIFICATION.format(name=name, description=achievement[2]))
+
+    @staticmethod
+    async def professional_check(data: StatesData, bot: Bot):
+        user_id = data['chat_id']
+        user = users.find_one(filter={'user_id': user_id})
+        theme = data['theme']
+        name = '🧑‍💼 Профессионал'
+        achievement = user['achievements'][name]
+
+        if theme != ThemeButton.PROFESSIONS:
+            return
+
+        if achievement[0] == achievement[1]:
+            return
+
+        achievement[0] += 1
+        users.update_one(filter={'user_id': user_id},
+                         update={'$set': {f'achievements.{name}': achievement}})
+        if achievement[0] == achievement[1]:
+            await bot.send_message(chat_id=data['chat_id'],
+                                   text=NOTIFICATION.format(name=name, description=achievement[2]))
+
+    @staticmethod
+    async def cartographer_check(data: StatesData, bot: Bot):
+        user_id = data['chat_id']
+        user = users.find_one(filter={'user_id': user_id})
+        theme = data['theme']
+        name = '🗺 Картограф'
+        achievement = user['achievements'][name]
+
+        if theme != ThemeButton.TOWNS:
+            return
+
+        if achievement[0] == achievement[1]:
+            return
+
+        achievement[0] += 1
+        users.update_one(filter={'user_id': user_id},
+                         update={'$set': {f'achievements.{name}': achievement}})
+        if achievement[0] == achievement[1]:
+            await bot.send_message(chat_id=data['chat_id'],
+                                   text=NOTIFICATION.format(name=name, description=achievement[2]))
+
+    @staticmethod
+    async def movie_fan_check(data: StatesData, bot: Bot):
+        user_id = data['chat_id']
+        user = users.find_one(filter={'user_id': user_id})
+        theme = data['theme']
+        name = '🎬 Киноман'
+        achievement = user['achievements'][name]
+
+        if theme != ThemeButton.MOVIES:
+            return
+
+        if achievement[0] == achievement[1]:
+            return
+
+        achievement[0] += 1
         users.update_one(filter={'user_id': user_id},
                          update={'$set': {f'achievements.{name}': achievement}})
         if achievement[0] == achievement[1]:

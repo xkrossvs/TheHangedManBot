@@ -5,7 +5,7 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove, InputMediaPhoto
-from themes import THEME_DICT, THEME_NAMES, THEMES
+from themes import THEME_DICT, THEME_NAMES, THEMES, Theme
 from config import users
 from hangs import STAGES
 from keyboards import Keyboards
@@ -71,10 +71,19 @@ async def profile_handler(message: Message):
 async def new_game_handler(message: Message):
     user_id = message.from_user.id
     user = users.find_one(filter={'user_id': user_id})
+    achievements = user['achievements']
+
     for theme in THEMES:
         if theme.used_words not in user:
             users.update_one(filter={'user_id': user_id},
                              update={'$set': {f'{theme.used_words}': []}})
+
+    for achievement in ACHIEVEMENTS:
+        if achievement not in achievements:
+            achievements[achievement] = ACHIEVEMENTS[achievement]
+    users.update_one(filter={'user_id': user_id},
+                     update={'$set': {'achievements': achievements}})
+
     await message.answer(text='Выберите тему',
                          reply_markup=Keyboards.themes())
 
@@ -93,7 +102,8 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     await bot.delete_message(chat_id=loading_message.chat.id,
                              message_id=loading_message.message_id)
     user_id = message.from_user.id
-    theme = THEME_DICT.get(message.text)
+    theme: Theme = THEME_DICT.get(message.text)
+    await state.update_data(theme=message.text)
     words = get_word_list(theme.words)
     # TODO: used_words в профиль
     used_words = users.find_one({'user_id': user_id})[theme.used_words]
@@ -149,6 +159,9 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
         await AchievementUnits.without_a_miss_check(data, bot)
         await AchievementUnits.bladerunner_check(data, bot)
         await AchievementUnits.da_vinci_code_check(data, bot)
+        await AchievementUnits.cartographer_check(data, bot)
+        await AchievementUnits.movie_fan_check(data, bot)
+        await AchievementUnits.professional_check(data, bot)
 
         await state.clear()
     else:
