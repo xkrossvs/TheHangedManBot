@@ -1,5 +1,5 @@
 from random import choice
-
+from  datetime import datetime
 from aiogram import F, Bot, Router
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
@@ -135,6 +135,8 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     await state.update_data(chat_id=chat_id)
     message_id = answer.message_id
     await state.update_data(message_id=message_id)
+    start_time = datetime.now()
+    await state.update_data(start_time=start_time)
     await state.set_state(GameProcess.game)
 
 
@@ -168,6 +170,7 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
         await AchievementUnits.cartographer_check(data, bot)
         await AchievementUnits.movie_fan_check(data, bot)
         await AchievementUnits.professional_check(data, bot)
+        await AchievementUnits.flash_check(data, bot)
 
         await state.clear()
     else:
