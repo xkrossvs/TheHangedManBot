@@ -34,6 +34,6 @@ class Keyboards:
         builder = ReplyKeyboardBuilder()
         for theme in THEME_NAMES:
             builder.add(KeyboardButton(text=theme))
-        builder.adjust(2, 2)
-        return builder.as_markup(resize_keyboard=True,
-                                 one_time_keyboard=True)
+        builder.add(KeyboardButton(text=Strings.BACK_BUTTON))
+        builder.adjust(2, 2, 1)
+        return builder.as_markup(resize_keyboard=True)

@@ -97,16 +97,22 @@ async def main_menu_handler(message: Message) -> None:
 
 @router.message(F.text.in_(THEME_NAMES))
 async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> None:
-    loading_message = await message.answer(text='Загрузка...',
-                                           reply_markup=ReplyKeyboardRemove())
-    await bot.delete_message(chat_id=loading_message.chat.id,
-                             message_id=loading_message.message_id)
     user_id = message.from_user.id
     theme: Theme = THEME_DICT.get(message.text)
     await state.update_data(theme=message.text)
     words = get_word_list(theme.words)
-    # TODO: used_words в профиль
     used_words = users.find_one({'user_id': user_id})[theme.used_words]
+
+    if len(words) == len(used_words):
+        await message.answer(text='У вас закончились слова в этой категории',
+                             reply_markup=Keyboards.themes())
+        return
+
+    loading_message = await message.answer(text='Загрузка...',
+                                           reply_markup=ReplyKeyboardRemove())
+    await bot.delete_message(chat_id=loading_message.chat.id,
+                             message_id=loading_message.message_id)
+
     word = choice(words)
     while word in used_words:
         word = choice(words)
