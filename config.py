@@ -8,7 +8,7 @@ TOKEN = '7441827338:AAHJPp1FieBS8oAL6HDmveneZzOJPjX2rVY'
 MONGO_URL = 'mongodb+srv://ivankblintsov:0FDeYNh9HDqBEsQJ@cluster.6pua1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster'
 cluster = pymongo.MongoClient(MONGO_URL)
 users: Collection = cluster.the_hanged_man.users
-LOG_GROUP_ID = -2324422338
+LOG_GROUP_ID = -1002324422338
 
 
 class StatesData(TypedDict):

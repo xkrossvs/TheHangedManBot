@@ -1,5 +1,7 @@
-from config import users
+from config import users, LOG_GROUP_ID
 from strings import Strings
+from aiogram.types import Message, TelegramObject
+from aiogram import Bot
 
 
 def find_all_indices(word: str, char: str) -> list[int]:
@@ -33,3 +35,14 @@ def find_place(field: str, id_user: int) -> int:
     for place, user_id in enumerate(users_data):
         if user_id == id_user:
             return place + 1
+
+
+async def send_log(action: str, update: TelegramObject, bot: Bot):
+    user_id = update.from_user.id
+    username = update.from_user.username
+    name = update.from_user.full_name
+    link = [name, f'<a href="t.me/{username}">{name}</a>']
+    print(username)
+    await bot.send_message(chat_id=LOG_GROUP_ID,
+                           text=f'<u>{link[bool(username)]}</u> (id: <code>{user_id}</code>) {action}.',
+                           disable_web_page_preview=True)

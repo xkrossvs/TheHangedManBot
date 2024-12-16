@@ -1,5 +1,5 @@
 from random import choice
-from  datetime import datetime
+from datetime import datetime
 from aiogram import F, Bot, Router
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
@@ -11,7 +11,7 @@ from hangs import STAGES
 from keyboards import Keyboards
 from stickers import win_stickers
 from strings import Strings, Game
-from units import find_all_indices, is_it_a_win, find_place
+from units import find_all_indices, is_it_a_win, find_place, send_log
 from words import get_word_list
 from filters import IsTheLetterRight, IsTheLetterWrong
 from mongo_units import MongoUnits
@@ -26,7 +26,7 @@ class GameProcess(StatesGroup):
 
 
 @router.message(CommandStart())
-async def command_start_handler(message: Message) -> None:
+async def command_start_handler(message: Message, bot: Bot) -> None:
     await message.answer(text=f"Привет, {message.from_user.full_name}, и добро пожаловать в игру '<b>Висельница</b>'. "
                               f"Нажмите 'Начать игру', чтобы начать игру.",
                          reply_markup=Keyboards.main_menu())
@@ -44,10 +44,14 @@ async def command_start_handler(message: Message) -> None:
                           'win_streak': 0, 'max_win_streak': 0,
                           'achievements': ACHIEVEMENTS} | theme_inserter(THEMES))
 
+        await send_log('зарегистрировался', message, bot)
+        return
+    await send_log('нажал на старт', message, bot)
+
 
 @router.message(Command('profile'))
 @router.message(F.text == Strings.PROFILE_BUTTON)
-async def profile_handler(message: Message):
+async def profile_handler(message: Message, bot: Bot):
     user_id = message.from_user.id
     info = users.find_one({'user_id': user_id})
     await message.answer(text=f'<blockquote>👤 {info["full_name"]}</blockquote>\n\n'
@@ -62,13 +66,14 @@ async def profile_handler(message: Message):
                               f'📊 По винрейту: <b>{find_place("WL", user_id)}</b>\n'
                               f'🔥 По винстрику: <b>{find_place("max_win_streak", user_id)}</b>',
                          reply_markup=Keyboards.main_menu())
+    await send_log('интересуется собой в профиле', message, bot)
 
 
 # TODO: исключить попытки выйти из игры во время угадывания
 # TODO: поменять текст
 @router.message(Command('new_game'))
 @router.message(F.text == Strings.NEW_GAME_BUTTON)
-async def new_game_handler(message: Message):
+async def new_game_handler(message: Message, bot: Bot):
     user_id = message.from_user.id
     user = users.find_one(filter={'user_id': user_id})
     achievements = user['achievements']
@@ -86,13 +91,15 @@ async def new_game_handler(message: Message):
 
     await message.answer(text='Выберите тему',
                          reply_markup=Keyboards.themes())
+    await send_log('выбирает тему для игры', message, bot)
 
 
 # TODO: поменять текст
 @router.message(F.text == Strings.BACK_BUTTON)
-async def main_menu_handler(message: Message) -> None:
+async def main_menu_handler(message: Message, bot: Bot) -> None:
     await message.answer(text='Главное меню',
                          reply_markup=Keyboards.main_menu())
+    await send_log('вернулся в главное меню', message, bot)
 
 
 @router.message(F.text.in_(THEME_NAMES))
@@ -106,6 +113,7 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     if len(words) == len(used_words):
         await message.answer(text='У вас закончились слова в этой категории',
                              reply_markup=Keyboards.themes())
+        await send_log(f'отыграл все слова в категории: {theme}', message, bot)
         return
 
     loading_message = await message.answer(text='Загрузка...',
@@ -138,6 +146,7 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     start_time = datetime.now()
     await state.update_data(start_time=start_time)
     await state.set_state(GameProcess.game)
+    await send_log(f'начал игру в теме: {theme}', message, bot)
 
 
 @router.message(IsTheLetterRight(), F.text.len() == 1, GameProcess.game)
@@ -171,6 +180,7 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
         await AchievementUnits.movie_fan_check(data, bot)
         await AchievementUnits.professional_check(data, bot)
         await AchievementUnits.flash_check(data, bot)
+        await send_log('победил', message, bot)
 
         await state.clear()
     else:
@@ -183,6 +193,7 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
                                        chat_id=data['chat_id'],
                                        message_id=data['message_id'])
         await AchievementUnits.instant_insight_check(data, bot)
+        await send_log('отгадал букву', message, bot)
 
 
 @router.message(IsTheLetterWrong(), F.text.len() == 1, GameProcess.game)
@@ -207,6 +218,7 @@ async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
         await bot.edit_message_media(media=media,
                                      chat_id=data['chat_id'],
                                      message_id=data['message_id'])
+        await send_log('не отгадал букву', message, bot)
     else:
         await bot.delete_message(chat_id=data['chat_id'],
                                  message_id=data['message_id'])
@@ -223,6 +235,7 @@ async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
         MongoUnits.wl_negative_update(user_id)
         await AchievementUnits.success_series_check(data, bot)
         await AchievementUnits.champion_series_check(data, bot)
+        await send_log('проиграл', message, bot)
 
         await state.clear()
 
