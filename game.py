@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove, InputMediaPhoto
 from themes import THEME_DICT, THEME_NAMES, THEMES, Theme
-from config import users
+from config import users, ADMINS
 from hangs import STAGES
 from keyboards import Keyboards
 from stickers import win_stickers
@@ -25,8 +25,24 @@ class GameProcess(StatesGroup):
     game = State()
 
 
+class MailingProcess(StatesGroup):
+    mailing = State()
+
+
+@router.message(F.from_user.id.in_(ADMINS), F.text == 'рассылка')
+async def mailing_starter(message: Message, state: FSMContext):
+    await message.answer('Напишите, что вы хотите всем разослать.')
+    await state.set_state(MailingProcess.mailing)
+
+
+@router.message(MailingProcess.mailing)
+async def mailing_process(message: Message, state: FSMContext):
+    await message.send_copy(chat_id=ADMINS[1])
+    await state.clear()
+
+
 @router.message(CommandStart())
-async def command_start_handler(message: Message, bot: Bot) -> None:
+async def command_start_handler(message: Message, bot: Bot):
     await message.answer(text=f"Привет, {message.from_user.full_name}, и добро пожаловать в игру '<b>Висельница</b>'. "
                               f"Нажмите 'Начать игру', чтобы начать игру.",
                          reply_markup=Keyboards.main_menu())

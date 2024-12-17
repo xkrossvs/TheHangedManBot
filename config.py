@@ -9,6 +9,7 @@ MONGO_URL = 'mongodb+srv://ivankblintsov:0FDeYNh9HDqBEsQJ@cluster.6pua1.mongodb.
 cluster = pymongo.MongoClient(MONGO_URL)
 users: Collection = cluster.the_hanged_man.users
 LOG_GROUP_ID = -1002324422338
+ADMINS = [618805465, 241322552]
 
 
 class StatesData(TypedDict):
