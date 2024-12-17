@@ -13,9 +13,10 @@ router = Router()
 
 @router.message(Command('leader_board'))
 @router.message(F.text == Strings.LEADER_BOARD_BUTTON)
-async def leader_board_message(message: Message):
+async def leader_board_message(message: Message, bot: Bot):
     await message.answer(text='Выберите рейтинг, который хотите посмотреть:',
                          reply_markup=Keyboards.leader_board())
+    await send_log('решил посмотреть рейтинги', message, bot)
 
 
 @router.callback_query(F.data == Strings.WIN_LEADER_BOARD)

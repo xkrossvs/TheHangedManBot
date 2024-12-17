@@ -1,7 +1,8 @@
 from config import users, LOG_GROUP_ID
 from strings import Strings
-from aiogram.types import Message, TelegramObject
+from aiogram.types import TelegramObject
 from aiogram import Bot
+from datetime import datetime
 
 
 def find_all_indices(word: str, char: str) -> list[int]:
@@ -41,8 +42,9 @@ async def send_log(action: str, update: TelegramObject, bot: Bot):
     user_id = update.from_user.id
     username = update.from_user.username
     name = update.from_user.full_name
+    time = datetime.now().strftime('%S.%f')[:-3]
     link = [name, f'<a href="t.me/{username}">{name}</a>']
-    print(username)
     await bot.send_message(chat_id=LOG_GROUP_ID,
-                           text=f'<u>{link[bool(username)]}</u> (id: <code>{user_id}</code>) {action}.',
+                           text=f'<u>{link[bool(username)]}</u> (id: <code>{user_id}</code>) {action}.\n'
+                                f'<code>[{time}]</code>',
                            disable_web_page_preview=True)
