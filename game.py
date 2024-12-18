@@ -180,7 +180,7 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     await send_log(f'начал игру в теме: {theme.name}', message, bot)
 
 
-@router.message(IsTheLetterRight(), F.text.len() == 1, GameProcess.game)
+@router.message(GameProcess.game, F.text.len() == 1, IsTheLetterRight())
 async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
     user_id = message.from_user.id
     letter = message.text.upper()
@@ -227,7 +227,7 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
         await send_log('отгадал букву', message, bot)
 
 
-@router.message(IsTheLetterWrong(), F.text.len() == 1, GameProcess.game)
+@router.message(GameProcess.game, F.text.len() == 1, IsTheLetterWrong())
 async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
     await message.delete()
     user_id = message.from_user.id
