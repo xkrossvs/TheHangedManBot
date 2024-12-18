@@ -83,13 +83,15 @@ async def command_start_handler(message: Message, bot: Bot):
 async def profile_handler(message: Message, bot: Bot):
     user_id = message.from_user.id
     info = users.find_one({'user_id': user_id})
+    achievements_amount = AchievementUnits.achievements_generator(user_id).count('✅')
     await message.answer(text=f'<blockquote>👤 {info["full_name"]}</blockquote>\n\n'
                               f'〰️ <i>Статистика</i> 〰️\n\n'
                               f'📯 Победы: <b>{info["wins"]}</b>\n'
                               f'☠️ Поражения: <b>{info["losses"]}</b>\n'
                               f'📊 Винрейт: <b>{info["WL"]}</b>\n'
                               f'🔥 Винстрик: <b>{info["win_streak"]}</b>\n'
-                              f'⚡️ Максимальный винстрик: <b>{info["max_win_streak"]}</b>\n\n'
+                              f'⚡️ Максимальный винстрик: <b>{info["max_win_streak"]}</b>\n'
+                              f'🧩 Достижения: <b>{achievements_amount} / {len(ACHIEVEMENTS)}</b>\n\n'
                               f'〰️ <i>Место в рейтинге</i> 〰️\n\n'
                               f'📯 По победам: <b>{find_place("wins", user_id)}</b>\n'
                               f'📊 По винрейту: <b>{find_place("WL", user_id)}</b>\n'
