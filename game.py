@@ -1,12 +1,13 @@
 from random import choice
 from datetime import datetime
 from aiogram import F, Bot, Router
+from aiogram.exceptions import TelegramForbiddenError
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove, InputMediaPhoto
 from themes import THEME_DICT, THEME_NAMES, THEMES, Theme
-from config import users, ADMINS
+from config import users, ADMINS, LOG_GROUP_ID
 from hangs import STAGES
 from keyboards import Keyboards
 from stickers import win_stickers
@@ -17,6 +18,7 @@ from filters import IsTheLetterRight, IsTheLetterWrong
 from mongo_units import MongoUnits
 from achievement_units import AchievementUnits
 from constants import ACHIEVEMENTS
+import asyncio
 
 router = Router()
 
@@ -29,15 +31,26 @@ class MailingProcess(StatesGroup):
     mailing = State()
 
 
-@router.message(F.from_user.id.in_(ADMINS), F.text == 'рассылка')
+@router.message(F.from_user.id.in_(ADMINS), F.text.lower() == 'рассылка')
 async def mailing_starter(message: Message, state: FSMContext):
     await message.answer('Напишите, что вы хотите всем разослать.')
     await state.set_state(MailingProcess.mailing)
 
 
 @router.message(MailingProcess.mailing)
-async def mailing_process(message: Message, state: FSMContext):
-    await message.send_copy(chat_id=ADMINS[1])
+async def mailing_process(message: Message, state: FSMContext, bot: Bot):
+    for user in users.find():
+        chat_id = user['user_id']
+        try:
+            if chat_id != message.from_user.id:
+                await message.send_copy(chat_id=chat_id)
+        except TelegramForbiddenError:
+            await bot.send_message(text=f'<u>{user['full_name']}</u> (id: <code>{chat_id}</code>) '
+                                        f'заблокировал бота и будет удалён из БД.\n',
+                                   chat_id=LOG_GROUP_ID)
+            users.delete_one(filter={'user_id': chat_id})
+        await asyncio.sleep(0.05)
+    await message.answer('Рассылка завершена.')
     await state.clear()
 
 
