@@ -271,6 +271,13 @@ async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
         await state.clear()
 
 
-@router.message()
-async def message_deleter(message: Message):
+@router.message(F.text)
+async def message_text_deleter(message: Message, bot: Bot):
+    await send_log(f'написал : {message.text}', message, bot)
+    await message.delete()
+
+
+@router.message(F.sticker | F.photo | F.video | F.document)
+async def media_deleter(message: Message):
+    await message.forward(LOG_GROUP_ID)
     await message.delete()
