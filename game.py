@@ -142,7 +142,7 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     if len(words) == len(used_words):
         await message.answer(text='У вас закончились слова в этой категории',
                              reply_markup=Keyboards.themes())
-        await send_log(f'отыграл все слова в категории: {theme}', message, bot)
+        await send_log(f'отыграл все слова в категории: {theme.name}', message, bot)
         return
 
     loading_message = await message.answer(text='Загрузка...',
@@ -175,7 +175,7 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     start_time = datetime.now()
     await state.update_data(start_time=start_time)
     await state.set_state(GameProcess.game)
-    await send_log(f'начал игру в теме: {theme}', message, bot)
+    await send_log(f'начал игру в теме: {theme.name}', message, bot)
 
 
 @router.message(IsTheLetterRight(), F.text.len() == 1, GameProcess.game)
