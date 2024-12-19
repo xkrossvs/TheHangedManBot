@@ -12,7 +12,7 @@ from hangs import STAGES
 from keyboards import Keyboards
 from stickers import win_stickers
 from strings import Strings, Game
-from units import find_all_indices, is_it_a_win, find_place, send_log
+from units import find_all_indices, is_it_a_win, find_place, send_log, find_place_time
 from words import get_word_list
 from filters import IsTheLetterRight, IsTheLetterWrong
 from mongo_units import MongoUnits
@@ -71,6 +71,7 @@ async def command_start_handler(message: Message, bot: Bot):
         users.insert_one({'user_id': user_id, 'full_name': full_name,
                           'wins': 0, 'losses': 0, 'WL': 0,
                           'win_streak': 0, 'max_win_streak': 0,
+                          'min_time': None,
                           'achievements': ACHIEVEMENTS} | theme_inserter(THEMES))
 
         await send_log('зарегистрировался', message, bot)
@@ -83,6 +84,7 @@ async def command_start_handler(message: Message, bot: Bot):
 async def profile_handler(message: Message, bot: Bot):
     user_id = message.from_user.id
     info = users.find_one({'user_id': user_id})
+    time = f'{info['min_time']} сек.' if info['min_time'] else '—'
     achievements_amount = AchievementUnits.achievements_generator(user_id).count('✅')
     await message.answer(text=f'<blockquote>👤 {info["full_name"]}</blockquote>\n\n'
                               f'〰️ <i>Статистика</i> 〰️\n\n'
@@ -91,11 +93,13 @@ async def profile_handler(message: Message, bot: Bot):
                               f'📊 Винрейт: <b>{info["WL"]}</b>\n'
                               f'🔥 Винстрик: <b>{info["win_streak"]}</b>\n'
                               f'⚡️ Максимальный винстрик: <b>{info["max_win_streak"]}</b>\n'
-                              f'🧩 Достижения: <b>{achievements_amount} / {len(ACHIEVEMENTS)}</b>\n\n'
+                              f'🧩 Достижения: <b>{achievements_amount} / {len(ACHIEVEMENTS)}</b>\n'
+                              f'⌛️ Минимальное время: <b>{time}</b>\n\n'
                               f'〰️ <i>Место в рейтинге</i> 〰️\n\n'
                               f'📯 По победам: <b>{find_place("wins", user_id)}</b>\n'
                               f'📊 По винрейту: <b>{find_place("WL", user_id)}</b>\n'
-                              f'🔥 По винстрику: <b>{find_place("max_win_streak", user_id)}</b>',
+                              f'🔥 По винстрику: <b>{find_place("max_win_streak", user_id)}</b>\n'
+                              f'⌛️ По скорости: <b>{find_place_time(user_id)}</b>',
                          reply_markup=Keyboards.main_menu())
     await send_log('интересуется собой в профиле', message, bot)
 
@@ -184,6 +188,7 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
 async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
     user_id = message.from_user.id
     letter = message.text.upper()
+    user = users.find_one(filter={'user_id': user_id})
     await message.delete()
     for i in find_all_indices(data['word'], letter):
         data['text_word'][i] = letter
@@ -212,6 +217,10 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
         await AchievementUnits.professional_check(data, bot)
         await AchievementUnits.flash_check(data, bot)
         await send_log('победил', message, bot)
+        time_of_win = round((datetime.now() - data['start_time']).total_seconds(), 2)
+        if user['min_time'] is None or user['min_time'] > time_of_win:
+            users.update_one(filter={'user_id': user_id},
+                             update={'$set': {'min_time': time_of_win}})
 
         await state.clear()
     else:

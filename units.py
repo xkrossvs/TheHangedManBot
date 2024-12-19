@@ -19,13 +19,23 @@ def is_it_a_win(word, text_word):
 
 
 def leaderboard_generate(field: str, id_user: int) -> str:
-    """Список возможных аргументов: max_win_streak, wins, WL."""
+    """Список возможных аргументов: max_win_streak, wins, WL"""
     users_data = users.find().sort(field, -1)
     user_leader_board = [[document['full_name'], document[field]] for document in users_data]
     message_text = Strings.LEADERS_TEXT[field]
     for place, info in enumerate(user_leader_board[:3]):
         message_text += f'{Strings.LEADER_BOARD_MEDALS[place]} <code>{info[0]}</code> ({info[1]})\n'
     message_text += f'\nВаша позиция: <b>{find_place(field, id_user)}</b>'
+    return message_text
+
+
+def leaderboard_generate_time(id_user: int) -> str:
+    users_data = users.find().sort('min_time', +1)
+    user_leader_board = [[document['full_name'], document['min_time']] for document in users_data if document['min_time']]
+    message_text = Strings.LEADERS_TEXT['min_time']
+    for place, info in enumerate(user_leader_board[:3]):
+        message_text += f'{Strings.LEADER_BOARD_MEDALS[place]} <code>{info[0]}</code> ({info[1]} сек.)\n'
+    message_text += f'\nВаша позиция: <b>{find_place_time(id_user)}</b>'
     return message_text
 
 
@@ -36,6 +46,15 @@ def find_place(field: str, id_user: int) -> int:
     for place, user_id in enumerate(users_data):
         if user_id == id_user:
             return place + 1
+
+
+def find_place_time(id_user: int) -> int | str:
+    users_data = users.find().sort('min_time', +1)
+    users_data = [document['user_id'] for document in users_data if document['min_time']]
+    for place, user_id in enumerate(users_data):
+        if user_id == id_user:
+            return place + 1
+    return '—'
 
 
 async def send_log(action: str, update: TelegramObject, bot: Bot):

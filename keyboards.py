@@ -26,7 +26,9 @@ class Keyboards:
                                          callback_data=Strings.WL_LEADER_BOARD))
         builder.add(InlineKeyboardButton(text=Strings.MWS_LEADER_BOARD,
                                          callback_data=Strings.MWS_LEADER_BOARD))
-        builder.adjust(1, 2)
+        builder.add(InlineKeyboardButton(text=Strings.MIN_TIME_LEADER_BOARD,
+                                         callback_data=Strings.MIN_TIME_LEADER_BOARD))
+        builder.adjust(2, 2)
         return builder.as_markup()
 
     @staticmethod

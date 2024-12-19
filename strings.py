@@ -5,14 +5,17 @@ class Strings:
     WIN_LEADER_BOARD = '📯 Победы'
     WL_LEADER_BOARD = '📊 Винрейт'
     MWS_LEADER_BOARD = '🔥 Винстрик'
+    MIN_TIME_LEADER_BOARD = '⌛️ Скорость'
     ACHIEVEMENTS_BUTTON = '🧩 Достижения'
     BACK_BUTTON = '↩️ Назад'
     LEADERS_TEXT = {
+        'min_time': '🏆 <b>Рейтинг по скорости</b>\n\n',
         'wins': '🏆 <b>Рейтинг по победам</b>\n\n',
         'WL': '🏆 <b>Рейтинг по винрейту</b>\n\n',
         'max_win_streak': '🏆 <b>Рейтинг по винстрику</b>\n\n'
     }
     LEADERS_KEYBOARDS = {
+        'min_time': f'{MIN_TIME_LEADER_BOARD}',
         'wins': f'{WIN_LEADER_BOARD}',
         'WL': f'{WL_LEADER_BOARD}',
         'max_win_streak': f'{MWS_LEADER_BOARD}'

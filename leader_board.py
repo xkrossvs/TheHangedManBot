@@ -1,6 +1,6 @@
 from aiogram.exceptions import TelegramBadRequest
 
-from units import leaderboard_generate, send_log
+from units import leaderboard_generate, send_log, leaderboard_generate_time
 from aiogram.filters import Command
 from aiogram import F, Router, Bot
 from aiogram.types import Message, CallbackQuery
@@ -50,3 +50,14 @@ async def win_leader_board_message(callback: CallbackQuery, bot: Bot):
     except TelegramBadRequest:
         await callback.answer('Вы и так здесь находитесь.')
     await send_log('интересуется рейтингом винстрика', callback, bot)
+
+
+@router.callback_query(F.data == Strings.MIN_TIME_LEADER_BOARD)
+async def time_leader_board_message(callback: CallbackQuery, bot: Bot):
+    user_id = callback.from_user.id
+    try:
+        await callback.message.edit_text(text=leaderboard_generate_time(user_id),
+                                         reply_markup=Keyboards.leader_board())
+    except TelegramBadRequest:
+        await callback.answer('Вы и так здесь находитесь.')
+    await send_log('интересуется рейтингом времени', callback, bot)
