@@ -1,6 +1,8 @@
 class Strings:
     PROFILE_BUTTON = '👤 Профиль'
     NEW_GAME_BUTTON = '🕹 Начать игру'
+    SINGLEPLAYER_BUTTON = '👤 1 игрок'
+    MULTIPLAYER_BUTTON = '👥 2 игрока'
     LEADER_BOARD_BUTTON = '🎖 Рейтинг'
     WIN_LEADER_BOARD = '📯 Победы'
     WL_LEADER_BOARD = '📊 Винрейт'
@@ -8,6 +10,9 @@ class Strings:
     MIN_TIME_LEADER_BOARD = '⌛️ Скорость'
     ACHIEVEMENTS_BUTTON = '🧩 Достижения'
     BACK_BUTTON = '↩️ Назад'
+    SHOP_BUTTON = '🏪 Магазин'
+    SHOP_HURRY_BUTTON = '🗣 Поторопить рабочих!'
+    MULTIPLAYER_HURRY_BUTTON = '🗣 Поторопить разработчиков!'
     LEADERS_TEXT = {
         'min_time': '🏆 <b>Рейтинг по скорости</b>\n\n',
         'wins': '🏆 <b>Рейтинг по победам</b>\n\n',

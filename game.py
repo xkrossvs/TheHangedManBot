@@ -5,7 +5,7 @@ from aiogram.exceptions import TelegramForbiddenError
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message, ReplyKeyboardRemove, InputMediaPhoto
+from aiogram.types import Message, ReplyKeyboardRemove, InputMediaPhoto, CallbackQuery
 from themes import THEME_DICT, THEME_NAMES, THEMES, Theme
 from config import users, ADMINS, LOG_GROUP_ID
 from hangs import STAGES
@@ -104,11 +104,38 @@ async def profile_handler(message: Message, bot: Bot):
     await send_log('интересуется собой в профиле', message, bot)
 
 
-# TODO: исключить попытки выйти из игры во время угадывания
-# TODO: поменять текст
 @router.message(Command('new_game'))
 @router.message(F.text == Strings.NEW_GAME_BUTTON)
 async def new_game_handler(message: Message, bot: Bot):
+    await message.answer(text='Выберите режим:\n\n'
+                              f'<b>{Strings.SINGLEPLAYER_BUTTON}</b>: <i>отгадывайте слова самостоятельно.</i>\n\n'
+                              f'<b>{Strings.MULTIPLAYER_BUTTON}</b>: <i>загадайте слово другу.</i>',
+                         reply_markup=Keyboards.gamemode_choice())
+    await send_log('выбирает режим игры', message, bot)
+
+
+@router.message(F.text == Strings.MULTIPLAYER_BUTTON)
+async def multiplayer_button(message: Message, bot: Bot):
+    await message.answer(text=f'<b>{Strings.MULTIPLAYER_BUTTON}</b>\n\n'
+                              f'Загадайте слово и добавьте при желании небольшую 💡 <i>подсказку</i>,'
+                              f' чтобы другу было интереснее отгадывать.\n\n'
+                              f'<blockquote><i>⚠️ Режим для двух игроков пока что не реализован.'
+                              f' Поторопите разработчиков, чтобы ускорить процесс.</i></blockquote>',
+                         reply_markup=Keyboards.multiplayer_hurry_button())
+    await send_log('решил проверить дружеский режим', message, bot)
+
+
+@router.callback_query(F.data == Strings.MULTIPLAYER_HURRY_BUTTON)
+async def shop_hurry(callback: CallbackQuery, bot: Bot):
+    await callback.answer(text='Спасибо! Мы работаем над этим режимом, а пока мы его делаем, поиграйте в одиночный.',
+                          show_alert=True)
+    await send_log('очень настойчиво требует режим для игры с друзьями', callback, bot)
+
+
+# TODO: исключить попытки выйти из игры во время угадывания
+# TODO: поменять текст
+@router.message(F.text == Strings.SINGLEPLAYER_BUTTON)
+async def singleplayer_handler(message: Message, bot: Bot):
     user_id = message.from_user.id
     user = users.find_one(filter={'user_id': user_id})
     achievements = user['achievements']
@@ -126,7 +153,7 @@ async def new_game_handler(message: Message, bot: Bot):
 
     await message.answer(text='Выберите тему',
                          reply_markup=Keyboards.themes())
-    await send_log('выбирает тему для игры', message, bot)
+    await send_log('выбрал путь одиночки и сейчас выбирает тему для игры', message, bot)
 
 
 # TODO: поменять текст

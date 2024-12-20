@@ -13,9 +13,10 @@ class Keyboards:
         builder.add(KeyboardButton(text=Strings.PROFILE_BUTTON))
         builder.add(KeyboardButton(text=Strings.ACHIEVEMENTS_BUTTON))
         builder.add(KeyboardButton(text=Strings.LEADER_BOARD_BUTTON))
-        builder.adjust(1, 3)
+        builder.add(KeyboardButton(text=Strings.SHOP_BUTTON))
+        builder.adjust(1, 2, 2)
         return builder.as_markup(resize_keyboard=True,
-                                 one_time_keyboard=True)
+                                 one_time_keyboard=False)
 
     @staticmethod
     def leader_board() -> InlineKeyboardMarkup:
@@ -39,3 +40,25 @@ class Keyboards:
         builder.add(KeyboardButton(text=Strings.BACK_BUTTON))
         builder.adjust(2, 2, 1)
         return builder.as_markup(resize_keyboard=True)
+
+    @staticmethod
+    def shop_hurry_button() -> InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        builder.add(InlineKeyboardButton(text=Strings.SHOP_HURRY_BUTTON,
+                                         callback_data=Strings.SHOP_HURRY_BUTTON))
+        return builder.as_markup()
+
+    @staticmethod
+    def gamemode_choice() -> ReplyKeyboardMarkup:
+        builder = ReplyKeyboardBuilder()
+        builder.add(KeyboardButton(text=Strings.SINGLEPLAYER_BUTTON))
+        builder.add(KeyboardButton(text=Strings.MULTIPLAYER_BUTTON))
+        builder.adjust(2)
+        return builder.as_markup(resize_keyboard=True)
+
+    @staticmethod
+    def multiplayer_hurry_button() -> InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        builder.add(InlineKeyboardButton(text=Strings.MULTIPLAYER_HURRY_BUTTON,
+                                         callback_data=Strings.MULTIPLAYER_HURRY_BUTTON))
+        return builder.as_markup()
