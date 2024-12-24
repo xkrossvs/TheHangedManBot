@@ -12,7 +12,7 @@ from hangs import STAGES
 from keyboards import Keyboards
 from stickers import win_stickers
 from strings import Strings, Game
-from units import find_all_indices, is_it_a_win, find_place, send_log, find_place_time, get_progress_bar_text, get_progress_bar_info
+from units import find_all_indices, is_it_a_win, find_place, send_log, find_place_time, get_progress_bar_text, get_progress_bar_info, convert_place_to_text
 from words import get_word_list
 from filters import IsTheLetterRight, IsTheLetterWrong
 from mongo_units import MongoUnits
@@ -99,10 +99,10 @@ async def profile_handler(message: Message, bot: Bot):
                               f'🧩 Всего: <b>{achievements_amount} / {len(ACHIEVEMENTS)}</b>\n\n'
                               f'{progress_bar}\n\n'
                               f'🔘 <u><b>Место в рейтинге</b></u>\n\n'
-                              f'📯 По победам: <b>{find_place("wins", user_id)}</b>\n'
-                              f'📊 По винрейту: <b>{find_place("WL", user_id)}</b>\n'
-                              f'🔥 По винстрику: <b>{find_place("max_win_streak", user_id)}</b>\n'
-                              f'⌛️ По скорости: <b>{find_place_time(user_id)}</b>',
+                              f'📯 По победам: <b>{convert_place_to_text(find_place("wins", user_id))}</b>\n'
+                              f'📊 По винрейту: <b>{convert_place_to_text(find_place("WL", user_id))}</b>\n'
+                              f'🔥 По винстрику: <b>{convert_place_to_text(find_place("max_win_streak", user_id))}</b>\n'
+                              f'⌛️ По скорости: <b>{convert_place_to_text(find_place_time(user_id))}</b>',
                          reply_markup=Keyboards.main_menu())
     await send_log('интересуется собой в профиле', message, bot)
 

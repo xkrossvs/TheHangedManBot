@@ -94,3 +94,9 @@ def get_progress_bar_text(info: ProgressBarInfo) -> str:
     text += '⬜️' * info.white_squares
     text += f' {info.percentage}%'
     return text
+
+
+def convert_place_to_text(place: int) -> str:
+    if place in (1, 2, 3):
+        return f'{place} {Strings.LEADER_BOARD_MEDALS[place - 1]}'
+    return str(place)
