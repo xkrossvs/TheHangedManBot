@@ -3,6 +3,7 @@ from strings import Strings
 from aiogram.types import TelegramObject
 from aiogram import Bot
 from datetime import datetime
+from dataclasses import dataclass
 
 
 def find_all_indices(word: str, char: str) -> list[int]:
@@ -67,3 +68,29 @@ async def send_log(action: str, update: TelegramObject, bot: Bot):
                            text=f'<u>{link[bool(username)]}</u> (id: <code>{user_id}</code>) {action}.\n'
                                 f'<code>[{time}]</code>',
                            disable_web_page_preview=True)
+
+
+@dataclass
+class ProgressBarInfo:
+    green_squares: int
+    white_squares: int
+    percentage: int
+
+
+def get_progress_bar_info(completed: int, total: int) -> ProgressBarInfo:
+    percentage = round(completed / total * 100)
+    green_squares = percentage // 10
+    white_squares = 10 - green_squares
+
+    return ProgressBarInfo(
+        green_squares=green_squares,
+        white_squares=white_squares,
+        percentage=percentage
+    )
+
+
+def get_progress_bar_text(info: ProgressBarInfo) -> str:
+    text = '🟩' * info.green_squares
+    text += '⬜️' * info.white_squares
+    text += f' {info.percentage}%'
+    return text

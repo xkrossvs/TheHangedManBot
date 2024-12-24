@@ -12,7 +12,7 @@ from hangs import STAGES
 from keyboards import Keyboards
 from stickers import win_stickers
 from strings import Strings, Game
-from units import find_all_indices, is_it_a_win, find_place, send_log, find_place_time
+from units import find_all_indices, is_it_a_win, find_place, send_log, find_place_time, get_progress_bar_text, get_progress_bar_info
 from words import get_word_list
 from filters import IsTheLetterRight, IsTheLetterWrong
 from mongo_units import MongoUnits
@@ -86,16 +86,19 @@ async def profile_handler(message: Message, bot: Bot):
     info = users.find_one({'user_id': user_id})
     time = f'{info['min_time']} сек.' if info['min_time'] else '—'
     achievements_amount = AchievementUnits.achievements_generator(user_id).count('✅')
+    progress_bar = get_progress_bar_text(get_progress_bar_info(achievements_amount, len(ACHIEVEMENTS)))
     await message.answer(text=f'<blockquote>👤 {info["full_name"]}</blockquote>\n\n'
-                              f'〰️ <i>Статистика</i> 〰️\n\n'
+                              f'🔘 <u><b>Статистика</b></u>\n\n'
                               f'📯 Победы: <b>{info["wins"]}</b>\n'
                               f'☠️ Поражения: <b>{info["losses"]}</b>\n'
                               f'📊 Винрейт: <b>{info["WL"]}</b>\n'
                               f'🔥 Винстрик: <b>{info["win_streak"]}</b>\n'
                               f'⚡️ Максимальный винстрик: <b>{info["max_win_streak"]}</b>\n'
-                              f'🧩 Достижения: <b>{achievements_amount} / {len(ACHIEVEMENTS)}</b>\n'
                               f'⌛️ Минимальное время: <b>{time}</b>\n\n'
-                              f'〰️ <i>Место в рейтинге</i> 〰️\n\n'
+                              f'🔘 <u><b>Достижения</b></u>\n\n'
+                              f'🧩 Всего: <b>{achievements_amount} / {len(ACHIEVEMENTS)}</b>\n\n'
+                              f'{progress_bar}\n\n'
+                              f'🔘 <u><b>Место в рейтинге</b></u>\n\n'
                               f'📯 По победам: <b>{find_place("wins", user_id)}</b>\n'
                               f'📊 По винрейту: <b>{find_place("WL", user_id)}</b>\n'
                               f'🔥 По винстрику: <b>{find_place("max_win_streak", user_id)}</b>\n'
