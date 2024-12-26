@@ -7,7 +7,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove, InputMediaPhoto, CallbackQuery
 from themes import THEME_DICT, THEME_NAMES, THEMES, Theme
-from config import users, ADMINS, LOG_GROUP_ID
+from config import users, ADMINS, LOG_GROUP_ID, hangs
 from hangs import STAGES
 from keyboards import Keyboards
 from stickers import win_stickers
@@ -316,7 +316,16 @@ async def message_text_deleter(message: Message, bot: Bot):
     await message.delete()
 
 
+@router.message(F.from_user.id.in_(ADMINS), F.photo, F.caption)
+async def hang_photo_adder(message: Message):
+    hangs.update_one(filter={'hang_number': int(message.caption)},
+                     update={'$set': {'hang_id': message.photo[-1].file_id}})
+
+
 @router.message(F.sticker | F.photo | F.video | F.document)
 async def media_deleter(message: Message):
     await message.forward(LOG_GROUP_ID)
+
     await message.delete()
+
+
