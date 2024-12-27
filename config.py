@@ -1,11 +1,15 @@
 from datetime import datetime
 from typing import TypedDict
+from dotenv import load_dotenv
+import os
 
 import pymongo
 from pymongo.collection import Collection
 
-TOKEN = '7441827338:AAHJPp1FieBS8oAL6HDmveneZzOJPjX2rVY'
-MONGO_URL = 'mongodb+srv://ivankblintsov:0FDeYNh9HDqBEsQJ@cluster.6pua1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster'
+load_dotenv()
+
+TOKEN = os.getenv('TOKEN')
+MONGO_URL = os.getenv('MONGO_URL')
 cluster = pymongo.MongoClient(MONGO_URL)
 users: Collection = cluster.the_hanged_man.users
 hangs: Collection = cluster.the_hanged_man.hangs
