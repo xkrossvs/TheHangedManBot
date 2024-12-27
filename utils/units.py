@@ -1,5 +1,5 @@
 from config import users, LOG_GROUP_ID
-from strings import Strings
+from data.strings import Strings
 from aiogram.types import TelegramObject
 from aiogram import Bot
 from datetime import datetime

@@ -1,9 +1,9 @@
 from aiogram.filters import Command
 from aiogram import F, Router, Bot
 from aiogram.types import Message
-from strings import Strings
-from achievement_units import AchievementUnits
-from units import send_log
+from data.strings import Strings
+from utils.achievement_units import AchievementUnits
+from utils.units import send_log
 
 router = Router()
 

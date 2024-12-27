@@ -4,10 +4,7 @@ import sys
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
-import achievements
-import game
-import leader_board
-import shop
+from handlers import game, achievements, shop, leader_board
 from config import MONGO_URL, TOKEN
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.mongo import MongoStorage

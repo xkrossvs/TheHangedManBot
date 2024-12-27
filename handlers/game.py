@@ -6,18 +6,18 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove, InputMediaPhoto, CallbackQuery
-from themes import THEME_DICT, THEME_NAMES, THEMES, Theme
+from data.themes import THEME_DICT, THEME_NAMES, THEMES, Theme
 from config import users, ADMINS, LOG_GROUP_ID, hangs
-from hangs import STAGES
+from services.hangs import STAGES
 from keyboards import Keyboards
-from stickers import win_stickers
-from strings import Strings, Game
-from units import find_all_indices, is_it_a_win, find_place, send_log, find_place_time, get_progress_bar_text, get_progress_bar_info, convert_place_to_text
-from words import get_word_list
+from data.stickers import win_stickers
+from data.strings import Strings, Game
+from utils.units import find_all_indices, is_it_a_win, find_place, send_log, find_place_time, get_progress_bar_text, get_progress_bar_info, convert_place_to_text
+from utils.words import get_word_list
 from filters import IsTheLetterRight, IsTheLetterWrong
-from mongo_units import MongoUnits
-from achievement_units import AchievementUnits
-from constants import ACHIEVEMENTS
+from services.mongo_units import MongoUnits
+from utils.achievement_units import AchievementUnits
+from data.constants import ACHIEVEMENTS
 import asyncio
 
 router = Router()

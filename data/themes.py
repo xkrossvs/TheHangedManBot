@@ -1,5 +1,5 @@
 from typing import NamedTuple
-from strings import ThemeButton
+from data.strings import ThemeButton
 
 
 class Theme(NamedTuple):

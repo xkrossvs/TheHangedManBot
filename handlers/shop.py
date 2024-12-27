@@ -1,8 +1,8 @@
 from aiogram import Router, F, Bot
-from strings import Strings
+from data.strings import Strings
 from aiogram.types import Message, CallbackQuery
 from keyboards import Keyboards
-from units import send_log
+from utils.units import send_log
 
 router = Router()
 

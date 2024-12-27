@@ -1,11 +1,11 @@
 from aiogram.exceptions import TelegramBadRequest
 
-from units import leaderboard_generate, send_log, leaderboard_generate_time
+from utils.units import leaderboard_generate, send_log, leaderboard_generate_time
 from aiogram.filters import Command
 from aiogram import F, Router, Bot
 from aiogram.types import Message, CallbackQuery
 from keyboards import Keyboards
-from strings import Strings
+from data.strings import Strings
 
 
 router = Router()

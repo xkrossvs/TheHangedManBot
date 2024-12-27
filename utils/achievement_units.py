@@ -2,8 +2,8 @@ from datetime import datetime
 
 from config import users, StatesData
 from aiogram import Bot
-from hangs import STAGES
-from strings import ThemeButton
+from services.hangs import STAGES
+from data.strings import ThemeButton
 
 NOTIFICATION = ('✅ Получено достижение!\n\n'
                 '<b>{name}</b>\n'

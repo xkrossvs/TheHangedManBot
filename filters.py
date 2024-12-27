@@ -1,7 +1,7 @@
 from aiogram.filters import BaseFilter
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
-from strings import Strings
+from data.strings import Strings
 
 
 class IsTheLetterRight(BaseFilter):

@@ -1,5 +1,5 @@
 import pytest
-from units import ProgressBarInfo, get_progress_bar_info
+from utils.units import ProgressBarInfo, get_progress_bar_info
 
 
 @pytest.mark.parametrize(
