@@ -4,6 +4,7 @@ from aiogram.types import TelegramObject
 from aiogram import Bot
 from datetime import datetime
 from dataclasses import dataclass
+from config import ADMINS
 
 
 def find_all_indices(word: str, char: str) -> list[int]:
@@ -60,7 +61,10 @@ def find_place_time(id_user: int) -> int | str:
 
 async def send_log(action: str, update: TelegramObject, bot: Bot):
     user_id = update.from_user.id
-    username = update.from_user.username
+    if user_id in ADMINS:
+        username = None
+    else:
+        username = update.from_user.username
     name = update.from_user.full_name
     time = datetime.now().strftime('%S.%f')[:-3]
     link = [name, f'<a href="t.me/{username}">{name}</a>']
