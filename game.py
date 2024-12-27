@@ -178,7 +178,7 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     if len(words) == len(used_words):
         await message.answer(text='У вас закончились слова в этой категории',
                              reply_markup=Keyboards.themes())
-        await send_log(f'отыграл все слова в категории: {theme.name}', message, bot)
+        await send_log(f'отыграл все слова в категории: {theme.name}❗️❗️❗️ @bonevis, @jevil_the_big_shot', message, bot)
         return
 
     loading_message = await message.answer(text='Загрузка...',
@@ -314,6 +314,7 @@ async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
 async def message_text_deleter(message: Message, bot: Bot):
     await send_log(f'написал : {message.text}', message, bot)
     await message.delete()
+
 
 
 @router.message(F.from_user.id.in_(ADMINS), F.photo, F.caption)
