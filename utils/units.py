@@ -104,3 +104,10 @@ def convert_place_to_text(place: int) -> str:
     if place in (1, 2, 3):
         return f'{place} {Strings.LEADER_BOARD_MEDALS[place - 1]}'
     return str(place)
+
+
+def get_text(file_name: str) -> str:
+    with open(f'data/{file_name}.txt', 'r', encoding="utf8") as file:
+        text = file.readlines()
+        text = ''.join(text)
+        return text

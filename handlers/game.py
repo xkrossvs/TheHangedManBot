@@ -12,7 +12,7 @@ from services.hangs import STAGES
 from keyboards import Keyboards
 from data.stickers import win_stickers
 from data.strings import Strings, Game
-from utils.units import find_all_indices, is_it_a_win, find_place, send_log, find_place_time, get_progress_bar_text, get_progress_bar_info, convert_place_to_text
+from utils.units import find_all_indices, is_it_a_win, find_place, send_log, find_place_time, get_progress_bar_text, get_progress_bar_info, convert_place_to_text, get_text
 from utils.words import get_word_list
 from filters import IsTheLetterRight, IsTheLetterWrong
 from services.mongo_units import MongoUnits
@@ -56,8 +56,7 @@ async def mailing_process(message: Message, state: FSMContext, bot: Bot):
 
 @router.message(CommandStart())
 async def command_start_handler(message: Message, bot: Bot):
-    await message.answer(text=f"Привет, {message.from_user.full_name}, и добро пожаловать в игру '<b>Висельница</b>'. "
-                              f"Нажмите 'Начать игру', чтобы начать игру.",
+    await message.answer(text=get_text('start'),
                          reply_markup=Keyboards.main_menu())
     user_id = message.from_user.id
     full_name = message.from_user.full_name
@@ -77,6 +76,11 @@ async def command_start_handler(message: Message, bot: Bot):
         await send_log('зарегистрировался', message, bot)
         return
     # await send_log('нажал на старт', message, bot)
+
+
+@router.message(Command('help'))
+async def help_handler(message: Message):
+    await message.answer(get_text('help'))
 
 
 @router.message(Command('profile'))

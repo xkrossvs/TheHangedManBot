@@ -7,5 +7,6 @@ async def set_commands(bot: Bot):
                 BotCommand(command='profile', description='👤 Профиль'),
                 BotCommand(command='achievements', description='🧩 Достижения'),
                 BotCommand(command='leader_board', description='🎖 Рейтинг'),
-                BotCommand(command='start', description='🔄 Перезапуск')]
+                BotCommand(command='start', description='🔄 Перезапуск'),
+                BotCommand(command='help', description='❓ Помощь')]
     await bot.set_my_commands(commands, BotCommandScopeDefault())
