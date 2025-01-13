@@ -27,7 +27,7 @@ async def win_leader_board_message(callback: CallbackQuery, bot: Bot):
                                          reply_markup=Keyboards.leader_board())
     except TelegramBadRequest:
         await callback.answer('Вы и так здесь находитесь.')
-    await send_log('интересуется рейтингом побед', callback, bot)
+    # await send_log('интересуется рейтингом побед', callback, bot)
 
 
 @router.callback_query(F.data == Strings.WL_LEADER_BOARD)
@@ -38,7 +38,7 @@ async def win_leader_board_message(callback: CallbackQuery, bot: Bot):
                                          reply_markup=Keyboards.leader_board())
     except TelegramBadRequest:
         await callback.answer('Вы и так здесь находитесь.')
-    await send_log('интересуется рейтингом винрейта', callback, bot)
+    # await send_log('интересуется рейтингом винрейта', callback, bot)
 
 
 @router.callback_query(F.data == Strings.MWS_LEADER_BOARD)
@@ -49,7 +49,7 @@ async def win_leader_board_message(callback: CallbackQuery, bot: Bot):
                                          reply_markup=Keyboards.leader_board())
     except TelegramBadRequest:
         await callback.answer('Вы и так здесь находитесь.')
-    await send_log('интересуется рейтингом винстрика', callback, bot)
+    # await send_log('интересуется рейтингом винстрика', callback, bot)
 
 
 @router.callback_query(F.data == Strings.MIN_TIME_LEADER_BOARD)
@@ -60,4 +60,4 @@ async def time_leader_board_message(callback: CallbackQuery, bot: Bot):
                                          reply_markup=Keyboards.leader_board())
     except TelegramBadRequest:
         await callback.answer('Вы и так здесь находитесь.')
-    await send_log('интересуется рейтингом времени', callback, bot)
+    # await send_log('интересуется рейтингом времени', callback, bot)

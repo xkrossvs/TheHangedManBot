@@ -76,7 +76,7 @@ async def command_start_handler(message: Message, bot: Bot):
 
         await send_log('зарегистрировался', message, bot)
         return
-    await send_log('нажал на старт', message, bot)
+    # await send_log('нажал на старт', message, bot)
 
 
 @router.message(Command('profile'))
@@ -156,7 +156,7 @@ async def singleplayer_handler(message: Message, bot: Bot):
 
     await message.answer(text='Выберите тему',
                          reply_markup=Keyboards.themes())
-    await send_log('выбрал путь одиночки и сейчас выбирает тему для игры', message, bot)
+    # await send_log('выбрал путь одиночки и сейчас выбирает тему для игры', message, bot)
 
 
 # TODO: поменять текст
@@ -164,7 +164,7 @@ async def singleplayer_handler(message: Message, bot: Bot):
 async def main_menu_handler(message: Message, bot: Bot) -> None:
     await message.answer(text='Главное меню',
                          reply_markup=Keyboards.main_menu())
-    await send_log('вернулся в главное меню', message, bot)
+    # await send_log('вернулся в главное меню', message, bot)
 
 
 @router.message(F.text.in_(THEME_NAMES))
@@ -263,7 +263,7 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
                                        chat_id=data['chat_id'],
                                        message_id=data['message_id'])
         await AchievementUnits.instant_insight_check(data, bot)
-        await send_log('отгадал букву', message, bot)
+        # await send_log('отгадал букву', message, bot)
 
 
 @router.message(GameProcess.game, F.text.len() == 1, IsTheLetterWrong())
@@ -288,7 +288,7 @@ async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
         await bot.edit_message_media(media=media,
                                      chat_id=data['chat_id'],
                                      message_id=data['message_id'])
-        await send_log('не отгадал букву', message, bot)
+        # await send_log('не отгадал букву', message, bot)
     else:
         await bot.delete_message(chat_id=data['chat_id'],
                                  message_id=data['message_id'])
