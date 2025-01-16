@@ -160,7 +160,10 @@ async def singleplayer_handler(message: Message, bot: Bot):
     users.update_one(filter={'user_id': user_id},
                      update={'$set': {'achievements': achievements}})
 
-    await message.answer(text='Выберите тему',
+    await message.answer(text='📚 <b>Выбор темы</b>\n\n'
+                              '<blockquote>🔤 <i>Слова</i> — общая категория без темы и подсказок. '
+                              'Вам может попасться любое слово. '
+                              'Режим не для всех.</blockquote>',
                          reply_markup=Keyboards.themes())
     # await send_log('выбрал путь одиночки и сейчас выбирает тему для игры', message, bot)
 
@@ -168,7 +171,7 @@ async def singleplayer_handler(message: Message, bot: Bot):
 # TODO: поменять текст
 @router.message(F.text == Strings.BACK_BUTTON)
 async def main_menu_handler(message: Message, bot: Bot) -> None:
-    await message.answer(text='Главное меню',
+    await message.answer(text='🖥 <b>Главное меню</b>',
                          reply_markup=Keyboards.main_menu())
     # await send_log('вернулся в главное меню', message, bot)
 
