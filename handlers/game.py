@@ -12,7 +12,8 @@ from services.hangs import STAGES
 from keyboards import Keyboards
 from data.stickers import win_stickers
 from data.strings import Strings, Game
-from utils.units import find_all_indices, is_it_a_win, find_place, send_log, find_place_time, get_progress_bar_text, get_progress_bar_info, convert_place_to_text, get_text
+from utils.units import find_all_indices, is_it_a_win, find_place, send_log, find_place_time, get_progress_bar_text, \
+    get_progress_bar_info, convert_place_to_text, get_text
 from utils.words import get_word_list
 from filters import IsTheLetterRight, IsTheLetterWrong
 from services.mongo_units import MongoUnits
@@ -203,9 +204,12 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     wrong_letters = []
     await state.update_data(wrong_letters=wrong_letters)
     answer = await message.answer_photo(photo=STAGES[hang_state],
-                                        caption=f'Загадано слово из {len(word)} букв.\n'
-                                                f'{Strings.LIVES[hang_state]}\n\n'
-                                                f'{" ".join(text_word).replace('_', '◻️')}\n')
+                                        caption=f'<i>слово</i>\n'
+                                                f'{" ".join(text_word).replace('_', '◻️')}\n\n'
+                                                f'<i>жизни</i>\n'
+                                                f'{Strings.LIVES[-1]}\n\n'
+                                                f'<i>ошибки</i>\n'
+                                                f'{wrong_letters}')
     users.update_one(filter={'user_id': user_id},
                      update={'$push': {f'{theme.used_words}': word}})
     chat_id = answer.chat.id
@@ -228,15 +232,18 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
         data['text_word'][i] = letter
 
     if is_it_a_win(data['word'], data['text_word']):
-        await bot.delete_message(chat_id=data['chat_id'],
-                                 message_id=data['message_id'])
+        await bot.edit_message_caption(caption=f'<i>слово</i>\n'
+                                               f'{" ".join(data['text_word']).replace('_', '◻️')}\n\n'
+                                               f'<i>жизни</i>\n'
+                                               f'{Strings.LIVES[data['hang_state']]}\n\n'
+                                               f'<i>ошибки</i>\n'
+                                               f'{" ".join(data['wrong_letters'])}',
+                                       chat_id=data['chat_id'],
+                                       message_id=data['message_id'])
         await bot.send_sticker(data['chat_id'], choice(win_stickers))
-        await message.answer_photo(photo=STAGES[data['hang_state']],
-                                   caption=Game.WIN_TEXT.format(word=data['word'],
-                                                                lives=Strings.LIVES[data['hang_state']],
-                                                                wrong_letters=" ".join(data['wrong_letters'])),
-                                   message_effect_id='5046509860389126442',
-                                   reply_markup=Keyboards.main_menu())
+        await message.answer(text=Game.WIN_TEXT,
+                             message_effect_id='5046509860389126442',
+                             reply_markup=Keyboards.main_menu())
 
         MongoUnits.win_count_increase(user_id)
         MongoUnits.wl_and_mws_update(user_id)
@@ -259,11 +266,12 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
         await state.clear()
     else:
         await state.update_data(text_word=data['text_word'])
-        await bot.edit_message_caption(caption=f'Вы отгадали букву.\n'
-                                               f'Поздравляю, вы на 1 шаг ближе к победе.\n\n'
-                                               f'{Strings.LIVES[data['hang_state']]}\n\n'
+        await bot.edit_message_caption(caption=f'<i>слово</i>\n'
                                                f'{" ".join(data['text_word']).replace('_', '◻️')}\n\n'
-                                               f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
+                                               f'<i>жизни</i>\n'
+                                               f'{Strings.LIVES[data['hang_state']]}\n\n'
+                                               f'<i>ошибки</i>\n'
+                                               f'{" ".join(data['wrong_letters'])}',
                                        chat_id=data['chat_id'],
                                        message_id=data['message_id'])
         await AchievementUnits.instant_insight_check(data, bot)
@@ -282,28 +290,25 @@ async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
     await state.update_data(wrong_letters=data['wrong_letters'])
     data['hang_state'] -= 1
     await state.update_data(hang_state=data['hang_state'])
+    media = InputMediaPhoto(media=STAGES[data['hang_state']],
+                            caption=f'<i>слово</i>\n'
+                                    f'{" ".join(data['text_word']).replace('_', '◻️')}\n\n'
+                                    f'<i>жизни</i>\n'
+                                    f'{Strings.LIVES[data['hang_state']]}\n\n'
+                                    f'<i>ошибки</i>\n'
+                                    f'{" ".join(data['wrong_letters'])}')
     if data['hang_state'] != -7:
-        media = InputMediaPhoto(media=STAGES[data['hang_state']],
-                                caption=f'Вы не отгадали букву.\n'
-                                        f'Сожалею, вы на 1 шаг ближе к поражению.\n\n'
-                                        f'{Strings.LIVES[data['hang_state']]}\n\n'
-                                        f'{" ".join(data['text_word']).replace('_', '◻️')}\n\n'
-                                        f'Неправильные буквы: {" ".join(data['wrong_letters'])}')
         await bot.edit_message_media(media=media,
                                      chat_id=data['chat_id'],
                                      message_id=data['message_id'])
         # await send_log('не отгадал букву', message, bot)
     else:
-        await bot.delete_message(chat_id=data['chat_id'],
-                                 message_id=data['message_id'])
+        await bot.edit_message_media(media=media,
+                                     chat_id=data['chat_id'],
+                                     message_id=data['message_id'])
 
-        await message.answer_photo(photo=STAGES[data['hang_state']],
-                                   caption=f'Вы проиграли. :(\n'
-                                           f'{Strings.LIVES[data['hang_state']]}\n'
-                                           f'Слово было: {data['word']}\n'
-                                           f'Начните сначала.\n\n'
-                                           f'Неправильные буквы: {" ".join(data['wrong_letters'])}',
-                                   reply_markup=Keyboards.main_menu())
+        await message.answer(text=f'😐 Вы не отгадали слово:\n\n<b>{data['word']}</b>',
+                             reply_markup=Keyboards.main_menu())
         await AchievementUnits.complete_disaster_check(data, bot)
         MongoUnits.lose_count_increase(user_id)
         MongoUnits.wl_negative_update(user_id)
@@ -320,7 +325,6 @@ async def message_text_deleter(message: Message, bot: Bot):
     await message.delete()
 
 
-
 @router.message(F.from_user.id.in_(ADMINS), F.photo, F.caption)
 async def hang_photo_adder(message: Message):
     hangs.update_one(filter={'hang_number': int(message.caption)},
@@ -332,5 +336,3 @@ async def media_deleter(message: Message):
     await message.forward(LOG_GROUP_ID)
 
     await message.delete()
-
-
