@@ -13,7 +13,7 @@ from keyboards import Keyboards
 from data.stickers import win_stickers
 from data.strings import Strings, Game
 from utils.units import find_all_indices, is_it_a_win, find_place, send_log, find_place_time, get_progress_bar_text, \
-    get_progress_bar_info, convert_place_to_text, get_text
+    get_progress_bar_info, convert_place_to_text, get_text, get_wrong_string
 from utils.words import get_word_list
 from filters import IsTheLetterRight, IsTheLetterWrong
 from services.mongo_units import MongoUnits
@@ -209,7 +209,7 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
                                                 f'<i>жизни</i>\n'
                                                 f'{Strings.LIVES[-1]}\n\n'
                                                 f'<i>ошибки</i>\n'
-                                                f'{wrong_letters}')
+                                                f'{get_wrong_string(wrong_letters)}')
     users.update_one(filter={'user_id': user_id},
                      update={'$push': {f'{theme.used_words}': word}})
     chat_id = answer.chat.id
@@ -237,7 +237,7 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
                                                f'<i>жизни</i>\n'
                                                f'{Strings.LIVES[data['hang_state']]}\n\n'
                                                f'<i>ошибки</i>\n'
-                                               f'{" ".join(data['wrong_letters'])}',
+                                               f'{get_wrong_string(data['wrong_letters'])}',
                                        chat_id=data['chat_id'],
                                        message_id=data['message_id'])
         await bot.send_sticker(data['chat_id'], choice(win_stickers))
@@ -271,7 +271,7 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
                                                f'<i>жизни</i>\n'
                                                f'{Strings.LIVES[data['hang_state']]}\n\n'
                                                f'<i>ошибки</i>\n'
-                                               f'{" ".join(data['wrong_letters'])}',
+                                               f'{get_wrong_string(data['wrong_letters'])}',
                                        chat_id=data['chat_id'],
                                        message_id=data['message_id'])
         await AchievementUnits.instant_insight_check(data, bot)
@@ -296,7 +296,7 @@ async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
                                     f'<i>жизни</i>\n'
                                     f'{Strings.LIVES[data['hang_state']]}\n\n'
                                     f'<i>ошибки</i>\n'
-                                    f'{" ".join(data['wrong_letters'])}')
+                                    f'{get_wrong_string(data['wrong_letters'])}')
     if data['hang_state'] != -7:
         await bot.edit_message_media(media=media,
                                      chat_id=data['chat_id'],

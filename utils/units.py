@@ -111,3 +111,7 @@ def get_text(file_name: str) -> str:
         text = file.readlines()
         text = ''.join(text)
         return text
+
+
+def get_wrong_string(wrong_letters: list) -> str:
+    return " ".join(wrong_letters + ['_'] * (6 - len(wrong_letters)))
