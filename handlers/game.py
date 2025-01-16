@@ -58,7 +58,8 @@ async def mailing_process(message: Message, state: FSMContext, bot: Bot):
 @router.message(CommandStart())
 async def command_start_handler(message: Message, bot: Bot):
     await message.answer(text=get_text('start'),
-                         reply_markup=Keyboards.main_menu())
+                         reply_markup=Keyboards.main_menu(),
+                         disable_web_page_preview=True)
     user_id = message.from_user.id
     full_name = message.from_user.full_name
     if not users.find_one({'user_id': user_id}):
