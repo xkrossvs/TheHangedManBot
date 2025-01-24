@@ -141,8 +141,6 @@ async def shop_hurry(callback: CallbackQuery, bot: Bot):
     await send_log('очень настойчиво требует режим для игры с друзьями', callback, bot)
 
 
-# TODO: исключить попытки выйти из игры во время угадывания
-# TODO: поменять текст
 @router.message(F.text == Strings.SINGLEPLAYER_BUTTON)
 async def singleplayer_handler(message: Message, bot: Bot):
     user_id = message.from_user.id
@@ -168,7 +166,6 @@ async def singleplayer_handler(message: Message, bot: Bot):
     # await send_log('выбрал путь одиночки и сейчас выбирает тему для игры', message, bot)
 
 
-# TODO: поменять текст
 @router.message(F.text == Strings.BACK_BUTTON)
 async def main_menu_handler(message: Message, bot: Bot) -> None:
     await message.answer(text='🖥 <b>Главное меню</b>',
@@ -198,8 +195,6 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     word = choice(words)
     while word in used_words:
         word = choice(words)
-    print(word)
-    # TODO: убрать принт после разработки
     await state.update_data(word=word)
     text_word = ['_'] * len(word)
     await state.update_data(text_word=text_word)

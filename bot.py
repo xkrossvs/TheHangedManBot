@@ -4,7 +4,7 @@ import sys
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
-from handlers import game, achievements, shop, leader_board
+from handlers import game, achievements, shop, leader_board, limiter
 from config import MONGO_URL, TOKEN
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.mongo import MongoStorage
@@ -16,6 +16,7 @@ dp = Dispatcher(storage=storage)
 
 async def main() -> None:
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    dp.include_router(limiter.router)
     dp.include_router(shop.router)
     dp.include_router(leader_board.router)
     dp.include_router(achievements.router)
