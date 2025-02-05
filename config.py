@@ -16,11 +16,12 @@ cluster = pymongo.MongoClient(MONGO_URL)
 if TEST:
     TOKEN = os.getenv('TEST_TOKEN')
     users: Collection = cluster.the_hanged_man.users_test
+    hangs: Collection = cluster.the_hanged_man.hangs_test
 else:
     TOKEN = os.getenv('TOKEN')
     users: Collection = cluster.the_hanged_man.users
+    hangs: Collection = cluster.the_hanged_man.hangs
 
-hangs: Collection = cluster.the_hanged_man.hangs
 LOG_GROUP_ID = -1002324422338
 ADMINS = [618805465, 241322552]
 
