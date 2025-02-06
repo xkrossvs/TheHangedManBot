@@ -25,7 +25,8 @@ router = Router()
 
 
 class GameProcess(StatesGroup):
-    game = State()
+    letter = State()
+    word = State()
 
 
 class MailingProcess(StatesGroup):
@@ -208,7 +209,8 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
                                                 f'<i>жизни</i>\n'
                                                 f'{Strings.LIVES[-1]}\n\n'
                                                 f'<i>ошибки</i>\n'
-                                                f'{get_wrong_string(wrong_letters)}')
+                                                f'{get_wrong_string(wrong_letters)}',
+                                        reply_markup=Keyboards.guessing_mode_choice('letter'))
     users.update_one(filter={'user_id': user_id},
                      update={'$push': {f'{theme.used_words}': word}})
     chat_id = answer.chat.id
@@ -217,11 +219,11 @@ async def start_game_handler(message: Message, state: FSMContext, bot: Bot) -> N
     await state.update_data(message_id=message_id)
     start_time = datetime.now()
     await state.update_data(start_time=start_time)
-    await state.set_state(GameProcess.game)
+    await state.set_state(GameProcess.letter)
     await send_log(f'начал игру в теме: {theme.name}', message, bot)
 
 
-@router.message(GameProcess.game, F.text.len() == 1, IsTheLetterRight())
+@router.message(GameProcess.letter, F.text.len() == 1, IsTheLetterRight())
 async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
     user_id = message.from_user.id
     letter = message.text.upper()
@@ -238,7 +240,8 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
                                                f'<i>ошибки</i>\n'
                                                f'{get_wrong_string(data['wrong_letters'])}',
                                        chat_id=data['chat_id'],
-                                       message_id=data['message_id'])
+                                       message_id=data['message_id'],
+                                       reply_markup=Keyboards.guessing_mode_choice('letter'))
         await bot.send_sticker(data['chat_id'], choice(win_stickers))
         await message.answer(text=Game.WIN_TEXT,
                              message_effect_id='5046509860389126442',
@@ -272,12 +275,13 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
                                                f'<i>ошибки</i>\n'
                                                f'{get_wrong_string(data['wrong_letters'])}',
                                        chat_id=data['chat_id'],
-                                       message_id=data['message_id'])
+                                       message_id=data['message_id'],
+                                       reply_markup=Keyboards.guessing_mode_choice('letter'))
         await AchievementUnits.instant_insight_check(data, bot)
         # await send_log('отгадал букву', message, bot)
 
 
-@router.message(GameProcess.game, F.text.len() == 1, IsTheLetterWrong())
+@router.message(GameProcess.letter, F.text.len() == 1, IsTheLetterWrong())
 async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
     await message.delete()
     user_id = message.from_user.id
@@ -299,12 +303,14 @@ async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
     if data['hang_state'] != -7:
         await bot.edit_message_media(media=media,
                                      chat_id=data['chat_id'],
-                                     message_id=data['message_id'])
+                                     message_id=data['message_id'],
+                                     reply_markup=Keyboards.guessing_mode_choice('letter'))
         # await send_log('не отгадал букву', message, bot)
     else:
         await bot.edit_message_media(media=media,
                                      chat_id=data['chat_id'],
-                                     message_id=data['message_id'])
+                                     message_id=data['message_id'],
+                                     reply_markup=Keyboards.guessing_mode_choice('letter'))
 
         await message.answer(text=f'😐 Вы не отгадали слово:\n\n<b>{data['word']}</b>',
                              reply_markup=Keyboards.main_menu())

@@ -6,7 +6,7 @@ from asyncio import sleep
 router = Router()
 
 
-@router.message(GameProcess.game, F.text.len() > 1)
+@router.message(GameProcess.letter, F.text.len() > 1)
 async def limit_game_state(message: Message):
     await message.delete()
     note = await message.answer(text='Отправьте букву русского алфавита для продолжения игры.')

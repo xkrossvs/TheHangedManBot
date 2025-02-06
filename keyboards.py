@@ -62,3 +62,18 @@ class Keyboards:
         builder.add(InlineKeyboardButton(text=Strings.MULTIPLAYER_HURRY_BUTTON,
                                          callback_data=Strings.MULTIPLAYER_HURRY_BUTTON))
         return builder.as_markup()
+
+    @staticmethod
+    def guessing_mode_choice(game_mode: str) -> InlineKeyboardMarkup:
+        builder  = InlineKeyboardBuilder()
+        if game_mode == 'letter':
+            builder.add(InlineKeyboardButton(text=Strings.LETTER_MODE_BUTTON_ACTIVE,
+                                             callback_data=Strings.LETTER_MODE_CALLBACK))
+            builder.add(InlineKeyboardButton(text=Strings.WORD_MODE_BUTTON_INACTIVE,
+                                             callback_data=Strings.WORD_MODE_CALLBACK))
+        elif game_mode == 'word':
+            builder.add(InlineKeyboardButton(text=Strings.LETTER_MODE_BUTTON_INACTIVE,
+                                             callback_data=Strings.LETTER_MODE_CALLBACK))
+            builder.add(InlineKeyboardButton(text=Strings.WORD_MODE_BUTTON_ACTIVE,
+                                             callback_data=Strings.WORD_MODE_CALLBACK))
+        return builder.as_markup()
