@@ -30,3 +30,8 @@ async def switch_word_to_letter(callback: CallbackQuery, state: FSMContext):
 async def switch_word_to_word(callback: CallbackQuery):
     await callback.answer(text='⚠️ Вы и так в режиме отгадывания слова.',
                           show_alert=True)
+
+
+@router.callback_query(F.data.in_((Strings.LETTER_MODE_CALLBACK, Strings.WORD_MODE_CALLBACK)))
+async def no_switch(callback: CallbackQuery):
+    await callback.answer()
