@@ -234,7 +234,7 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
 
     if is_it_a_win(data['word'], data['text_word']):
         await bot.edit_message_caption(caption=f'<i>слово</i>\n'
-                                               f'{" ".join(data['text_word']).replace('_', '◻️')}\n\n'
+                                               f'{" ".join(data['text_word'])}\n\n'
                                                f'<i>жизни</i>\n'
                                                f'{Strings.LIVES[data['hang_state']]}\n\n'
                                                f'<i>ошибки</i>\n'
