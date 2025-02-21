@@ -13,7 +13,7 @@ from keyboards import Keyboards
 from data.stickers import win_stickers
 from data.strings import Strings, Game
 from utils.units import find_all_indices, is_it_a_win, find_place, send_log, find_place_time, get_progress_bar_text, \
-    get_progress_bar_info, convert_place_to_text, get_text, get_wrong_string
+    get_progress_bar_info, convert_place_to_text, get_text, get_wrong_string, remind_something
 from utils.words import get_word_list
 from filters import IsTheLetterRight, IsTheLetterWrong
 from services.mongo_units import MongoUnits
@@ -229,6 +229,11 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
     letter = message.text.upper()
     user = users.find_one(filter={'user_id': user_id})
     await message.delete()
+
+    if letter in data['text_word']:
+        await remind_something(text='Вы отправили букву, которую уже вводили.', message=message)
+        return
+
     for i in find_all_indices(data['word'], letter):
         data['text_word'][i] = letter
 
@@ -288,6 +293,7 @@ async def wrong_letter(message: Message, state: FSMContext, bot: Bot, **data):
     letter = message.text.upper()
 
     if letter in data['wrong_letters']:
+        await remind_something(text='Вы отправили букву, которую уже вводили.', message=message)
         return
     data['wrong_letters'].append(letter)
     await state.update_data(wrong_letters=data['wrong_letters'])

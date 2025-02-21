@@ -8,7 +8,7 @@ from pymongo.collection import Collection
 
 load_dotenv()
 
-TEST = 1
+TEST = 0
 
 MONGO_URL = os.getenv('MONGO_URL')
 cluster = pymongo.MongoClient(MONGO_URL)

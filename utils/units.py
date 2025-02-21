@@ -1,10 +1,11 @@
 from config import users, LOG_GROUP_ID
 from data.strings import Strings
-from aiogram.types import TelegramObject
+from aiogram.types import TelegramObject, Message
 from aiogram import Bot
 from datetime import datetime
 from dataclasses import dataclass
 from config import ADMINS
+from asyncio import sleep
 
 
 def find_all_indices(word: str, char: str) -> list[int]:
@@ -115,3 +116,12 @@ def get_text(file_name: str) -> str:
 
 def get_wrong_string(wrong_letters: list) -> str:
     return " ".join(wrong_letters + ['_'] * (6 - len(wrong_letters)))
+
+
+async def remind_something(text: str, message: Message):
+    note = await message.answer(text=text)
+    await sleep(5)
+    try:
+        await note.delete()
+    except:
+        pass
