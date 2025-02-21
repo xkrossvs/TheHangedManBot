@@ -243,7 +243,8 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
                                        message_id=data['message_id'],
                                        reply_markup=Keyboards.guessing_mode_choice('letter'))
         await bot.send_sticker(data['chat_id'], choice(win_stickers))
-        await message.answer(text=Game.WIN_TEXT,
+        time_of_win = round((datetime.now() - data['start_time']).total_seconds(), 2)
+        await message.answer(text=Game.WIN_TEXT.format(time_of_win=time_of_win),
                              message_effect_id='5046509860389126442',
                              reply_markup=Keyboards.main_menu())
 
@@ -260,7 +261,6 @@ async def right_letter(message: Message, bot: Bot, state: FSMContext, **data):
         await AchievementUnits.professional_check(data, bot)
         await AchievementUnits.flash_check(data, bot)
         await send_log('победил', message, bot)
-        time_of_win = round((datetime.now() - data['start_time']).total_seconds(), 2)
         if user['min_time'] is None or user['min_time'] > time_of_win:
             users.update_one(filter={'user_id': user_id},
                              update={'$set': {'min_time': time_of_win}})

@@ -44,7 +44,7 @@ class Strings:
 
 
 class Game:
-    WIN_TEXT = 'Слово отгадано!\n\n<b>Победа</b> 🔥'
+    WIN_TEXT = 'Слово отгадано! <code>({time_of_win} сек.)</code>\n\n<b>Победа</b> 🔥'
 
 
 class ThemeButton:
